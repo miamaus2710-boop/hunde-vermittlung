@@ -140,6 +140,13 @@ header p {
 </head>
 <body>
   <button onclick="document.getElementById('mitarbeiter-login').hidden = false">🔐 Mitarbeiter-Login</button>
+  <div id="passwort-zuruecksetzen" hidden>
+  <h3>🔐 Neues Passwort festlegen</h3>
+  <input type="password" id="neues-passwort"
+         placeholder="Neues Passwort" minlength="8">
+  <button id="passwort-speichern">Passwort speichern</button>
+  <p id="passwort-meldung"></p>
+</div>
   <div id="mitarbeiter-login"hidden>
   <h3>🐾 Mitarbeiter-Anmeldung</h3>
   <input type="email" id="login-email" placeholder="E-Mail-Adresse">
@@ -437,6 +444,34 @@ if (rollenFehler || !mitarbeiter ||
 }
 
 anmeldungWiederherstellen();
+supabaseClient.auth.onAuthStateChange((event) => {
+  if (event === "PASSWORD_RECOVERY") {
+    document.getElementById("passwort-zuruecksetzen").hidden = false;
+    document.getElementById("mitarbeiter-login").hidden = true;
+  }
+});
+
+document.getElementById("passwort-speichern").onclick = async () => {
+  const passwort = document.getElementById("neues-passwort").value;
+  const meldung = document.getElementById("passwort-meldung");
+
+  if (passwort.length < 8) {
+    meldung.textContent = "Bitte mindestens 8 Zeichen eingeben.";
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.updateUser({
+    password: passwort
+  });
+
+  if (error) {
+    meldung.textContent = "Fehler: " + error.message;
+  } else {
+    meldung.textContent = "Passwort erfolgreich gespeichert!";
+    document.getElementById("passwort-zuruecksetzen").hidden = true;
+    await supabaseClient.auth.signOut();
+  }
+};
   </script>
 </body>
 </html>

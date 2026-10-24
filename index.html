@@ -111,6 +111,43 @@ ladeHunde();
         hund.style.display = passt ? "" : "none";
       });
     }
+
+    async function ladeHunde() {
+  const { data, error } = await supabaseClient
+    .from("hunde")
+    .select("*");
+
+  if (error) {
+    console.error("Fehler beim Laden:", error);
+    return;
+  }
+
+  const liste = document.getElementById("hundeliste");
+  liste.innerHTML = "";
+
+  data.forEach(hund => {
+    const karte = document.createElement("div");
+    karte.className = "hund";
+    karte.dataset.name = hund.name || "";
+    karte.dataset.status = hund.vermittlungsstatus || "";
+
+    const inhalt = document.createElement("div");
+    inhalt.className = "inhalt";
+
+    const name = document.createElement("h2");
+    name.textContent = hund.name || "Unbekannt";
+
+    const status = document.createElement("p");
+    status.className = "status";
+    status.textContent = hund.vermittlungsstatus || "";
+
+    inhalt.append(name, status);
+    karte.append(inhalt);
+    liste.append(karte);
+  });
+}
+
+ladeHunde();
   </script>
 </body>
 </html>

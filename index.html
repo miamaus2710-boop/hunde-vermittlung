@@ -180,7 +180,18 @@ function zeigeHund(hund) {
     details.hidden = true;
     liste.style.display = "";
   };
+if (hund.fotos && hund.fotos.length > 0) {
+  const bild = document.createElement("img");
+  bild.src = hund.fotos[0];
+  bild.alt = "Foto von " + hund.name;
+  bild.style.width = "100%";
+  bild.style.maxWidth = "450px";
+  bild.style.height = "auto";
+  bild.style.display = "block";
+  bild.style.margin = "20px 0";
 
+  details.append(bild);
+}
   const titel = document.createElement("h2");
   titel.textContent = hund.name;
 

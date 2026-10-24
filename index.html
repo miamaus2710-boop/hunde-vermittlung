@@ -174,12 +174,20 @@ function zeigeHund(hund) {
   details.innerHTML = "";
 
   const zurueck = document.createElement("button");
-  zurueck.textContent = "← Zurück zu allen Hunden";
+  zurueck.textContent = "🐾 Zurück zu allen Hunden";
+  zurueck.style.backgroundColor = "#BDE0FE";
+zurueck.style.color = "#17324D";
+zurueck.style.border = "none";
+zurueck.style.borderRadius = "12px";
+zurueck.style.padding = "12px 20px";
+zurueck.style.fontSize = "16px";
+zurueck.style.cursor = "pointer";
 
   zurueck.onclick = () => {
     details.hidden = true;
     liste.style.display = "";
   };
+  details.append(zurueck);
 if (hund.fotos && hund.fotos.length > 0) {
   const bild = document.createElement("img");
   bild.src = hund.fotos[0];
@@ -198,7 +206,7 @@ if (hund.fotos && hund.fotos.length > 0) {
   const beschreibung = document.createElement("p");
   beschreibung.textContent = hund.beschreibung || "";
 
-  details.append(zurueck, titel, beschreibung);
+  details.append(titel, beschreibung);
 }
 ladeHunde();
   </script>

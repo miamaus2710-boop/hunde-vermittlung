@@ -39,6 +39,7 @@ ladeHunde();
       color: #26352d;
     }
  header {
+   position: relative;
     background-image: url("1000432202.png");
     background-size: 100% auto;
     background-position: center top;
@@ -52,6 +53,14 @@ ladeHunde();
     box-sizing: border-box;
     padding: 0;
     margin: 0;
+}
+  .vereinslogo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 130px;
+    height: auto;
+    z-index: 10;
 }
 header h1,
 header p {
@@ -97,6 +106,7 @@ header p {
 </head>
 <body>
   <header>
+    <img src="vereinslogo.png" alt="Vereinslogo" class="vereinslogo">
     <h1>🐾 Unsere Hunde suchen ein Zuhause</h1>
     <p>Strassenhunde-Rumänien-in-Not e.V.</p>
     <p>Lerne unsere Schützlinge kennen!</p>

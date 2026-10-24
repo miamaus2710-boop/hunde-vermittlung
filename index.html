@@ -125,6 +125,12 @@ header p {
  <div class="hunde" id="hundeliste"></div>
     <div id="hundedetails" hidden></div>
   </main>
+  <section id="verwaltung" hidden>
+  <h2>🐾 Hunde-Verwaltung</h2>
+  <p>Hier können berechtigte Mitarbeiter später Hunde verwalten.</p>
+  <button id="hund-hinzufuegen">➕ Neuen Hund hinzufügen</button>
+  <div id="verwaltungs-inhalt"></div>
+</section>
 
   <script>
     function filtern() {
@@ -265,7 +271,20 @@ ladeHunde();
   if (error) {
     meldung.textContent = "Anmeldung fehlgeschlagen. Bitte Zugangsdaten prüfen.";
   } else {
-    meldung.textContent = "Erfolgreich angemeldet!";
+    const { data: mitarbeiter, error: rollenFehler } = await supabaseClient
+  .from("mitarbeiter")
+  .select("rolle")
+  .eq("user_id", data.user.id)
+  .maybeSingle();
+
+if (rollenFehler || !mitarbeiter ||
+    !["admin", "mitarbeiter"].includes(mitarbeiter.rolle)) {
+  meldung.textContent = "Kein Zugang zur Hunde-Verwaltung.";
+  await supabaseClient.auth.signOut();
+} else {
+  meldung.textContent = "Angemeldet als " + mitarbeiter.rolle;
+  document.getElementById("verwaltung").hidden = false;
+}
   }
 };
   </script>

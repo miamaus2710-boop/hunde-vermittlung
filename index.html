@@ -13,7 +13,13 @@ const SUPABASE_KEY = "sb_publishable_pmk3JCtmNTxJpf_NMfnsBQ_OA-OmLJK";
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_KEY
+  SUPABASE_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true
+    }
+  }
 );
   console.log("Supabase-Verbindung eingerichtet:", !!supabaseClient);
   async function ladeHunde() {
@@ -408,6 +414,28 @@ if (rollenFehler || !mitarbeiter ||
     document.getElementById("hund-hinzufuegen").onclick = () => {
   document.getElementById("hunde-formular").hidden = false;
 };
+    async function anmeldungWiederherstellen() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if (!user) return;
+
+  const { data: mitarbeiter, error } = await supabaseClient
+    .from("mitarbeiter")
+    .select("rolle")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error || !mitarbeiter ||
+      !["admin", "mitarbeiter"].includes(mitarbeiter.rolle)) {
+    return;
+  }
+
+  document.getElementById("verwaltung").hidden = false;
+  document.getElementById("login-meldung").textContent =
+    "Angemeldet als " + mitarbeiter.rolle;
+}
+
+anmeldungWiederherstellen();
   </script>
 </body>
 </html>

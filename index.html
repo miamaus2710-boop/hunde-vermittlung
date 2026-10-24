@@ -334,6 +334,52 @@ beschreibung.textContent = hund.beschreibung || "";
     karte.append(inhalt);
     liste.append(karte);
   });
+      const loeschliste = document.getElementById("hunde-loeschliste");
+loeschliste.innerHTML = "";
+      data.forEach(hund => {
+  const eintrag = document.createElement("div");
+  const name = document.createElement("span");
+  name.textContent = hund.name + " ";
+
+  const knopf = document.createElement("button");
+  knopf.textContent = "🗑️ Löschen";
+  knopf.type = "button";
+knopf.onclick = async () => {
+  const bestaetigt = confirm(
+    "Möchtest du " + hund.name + " wirklich löschen?"
+  );
+
+  if (!bestaetigt) return;
+
+  const { data: { user }, error: authFehler } =
+    await supabaseClient.auth.getUser();
+
+  if (authFehler || !user) {
+    alert("Bitte zuerst als Mitarbeiter anmelden.");
+    return;
+  }
+
+  const { data: geloescht, error } = await supabaseClient
+    .from("hunde")
+    .delete()
+    .eq("id", hund.id)
+    .select("id");
+
+  if (error) {
+    alert("Fehler beim Löschen: " + error.message);
+    return;
+  }
+
+  if (!geloescht || geloescht.length === 0) {
+    alert("Löschen nicht erlaubt. Bitte Mitarbeiterrechte prüfen.");
+    return;
+  }
+
+  await ladeHunde();
+};
+  eintrag.append(name, knopf);
+  loeschliste.append(eintrag);
+});
 }
 function zeigeHund(hund) {
   const details = document.getElementById("hundedetails");

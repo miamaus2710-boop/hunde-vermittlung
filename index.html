@@ -129,6 +129,8 @@ ladeHunde();
   data.forEach(hund => {
     const karte = document.createElement("div");
     karte.className = "hund";
+    karte.style.cursor = "pointer";
+karte.addEventListener("click", () => zeigeHund(hund));
     karte.dataset.name = hund.name || "";
     karte.dataset.status = hund.vermittlungsstatus || "";
 if (hund.fotos && hund.fotos.length > 0) {
@@ -162,7 +164,31 @@ beschreibung.textContent = hund.beschreibung || "";
     liste.append(karte);
   });
 }
+function zeigeHund(hund) {
+  const details = document.getElementById("hundedetails");
+  const liste = document.getElementById("hundeliste");
 
+  liste.style.display = "none";
+  details.hidden = false;
+
+  details.innerHTML = "";
+
+  const zurueck = document.createElement("button");
+  zurueck.textContent = "← Zurück zu allen Hunden";
+
+  zurueck.onclick = () => {
+    details.hidden = true;
+    liste.style.display = "";
+  };
+
+  const titel = document.createElement("h2");
+  titel.textContent = hund.name;
+
+  const beschreibung = document.createElement("p");
+  beschreibung.textContent = hund.beschreibung || "";
+
+  details.append(zurueck, titel, beschreibung);
+}
 ladeHunde();
   </script>
 </body>

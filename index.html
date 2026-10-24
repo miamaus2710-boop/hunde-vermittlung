@@ -225,6 +225,21 @@ if (hund.fotos && hund.fotos.length > 0) {
   beschreibung.textContent = hund.beschreibung || "";
 
   details.append(titel, beschreibung);
+  const anfrage = document.createElement("button");
+anfrage.textContent = "❤️ Anfrage für " + hund.name + " senden";
+anfrage.style.backgroundColor = "#BDE0FE";
+anfrage.style.color = "#17324D";
+anfrage.style.border = "none";
+anfrage.style.borderRadius = "12px";
+anfrage.style.padding = "14px 22px";
+anfrage.style.fontSize = "16px";
+anfrage.style.cursor = "pointer";
+anfrage.style.marginTop = "20px";
+  anfrage.onclick = () => {
+  alert("Anfrage für " + hund.name + " – das Formular folgt!");
+};
+
+details.append(anfrage);
 }
 ladeHunde();
   </script>

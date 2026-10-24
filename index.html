@@ -99,6 +99,14 @@ header p {
   </style>
 </head>
 <body>
+  <button onclick="document.getElementById('mitarbeiter-login').hidden = false">🔐 Mitarbeiter-Login</button>
+  <div id="mitarbeiter-login"hidden>
+  <h3>🐾 Mitarbeiter-Anmeldung</h3>
+  <input type="email" id="login-email" placeholder="E-Mail-Adresse">
+  <input type="password" id="login-passwort" placeholder="Passwort">
+  <button id="login-button">Anmelden</button>
+  <p id="login-meldung"></p>
+</div>
   <header>
   </header>
 
@@ -242,6 +250,24 @@ anfrage.style.marginTop = "20px";
 details.append(anfrage);
 }
 ladeHunde();
+    document.getElementById("login-button").onclick = async () => {
+  const email = document.getElementById("login-email").value.trim();
+  const passwort = document.getElementById("login-passwort").value;
+  const meldung = document.getElementById("login-meldung");
+
+  meldung.textContent = "Anmeldung wird geprüft...";
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: passwort
+  });
+
+  if (error) {
+    meldung.textContent = "Anmeldung fehlgeschlagen. Bitte Zugangsdaten prüfen.";
+  } else {
+    meldung.textContent = "Erfolgreich angemeldet!";
+  }
+};
   </script>
 </body>
 </html>

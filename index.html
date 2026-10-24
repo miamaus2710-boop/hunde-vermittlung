@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f8f6f0">
+  <title>Hunde suchen ein Zuhause | Strassenhunde Rumänien in Not e.V.</title>
+  <meta name="description" content="Lerne unsere Hunde kennen und schenke einem Tierschutzhund ein liebevolles Zuhause.">
+  <style>
+    :root {
+      --green: #276749;
+      --dark: #20352b;
+      --cream: #f8f6f0;
+      --white: #ffffff;
+      --muted: #68756d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--dark);
+      background: var(--cream);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; }
+
+    header {
+      background: var(--white);
+      padding: 18px 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid #e9e8e0;
+    }
+
+    .brand {
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .brand span {
+      display: block;
+      font-size: 12px;
+      color: var(--green);
+      letter-spacing: 1px;
+    }
+
+    .contact-link {
+      text-decoration: none;
+      font-weight: bold;
+      color: var(--green);
+    }
+
+    .hero {
+      padding: 72px 6%;
+      text-align: center;
+      background: #e8eee4;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 12px;
+    }
+
+    h1 {
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.12;
+      margin: 14px auto;
+      max-width: 780px;
+    }
+
+    .hero p {
+      max-width: 620px;
+      margin: 18px auto 28px;
+      color: #4f6055;
+      font-size: 18px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 14px 24px;
+      background: var(--green);
+      color: white;
+      border-radius: 9px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .button:hover { background: #1c5138; }
+
+    main {
+      max-width: 1180px;
+      margin: auto;
+      padding: 54px 22px;
+    }
+
+    .section-heading { text-align: center; margin-bottom: 30px; }
+    .section-heading h2 { font-size: 32px; margin-bottom: 8px; }
+    .section-heading p { color: var(--muted); }
+
+    .notice {
+      background: white;
+      border: 1px solid #e4e5dc;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 0 auto 28px;
+      max-width: 750px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .dogs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 24px;
+    }
+
+    .dog-card {
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 18px #20352b0c;
+    }
+
+    .dog-photo {
+      height: 230px;
+      display: grid;
+      place-items: center;
+      background: #e8eee4;
+      color: var(--green);
+      font-size: 52px;
+    }
+
+    .dog-info { padding: 20px; }
+    .dog-info h3 { margin: 0 0 5px; font-size: 23px; }
+    .dog-info p { color: var(--muted); margin: 7px 0 17px; }
+    .tag {
+      display: inline-block;
+      background: #edf4ec;
+      color: var(--green);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .dog-info .button {
+      display: block;
+      text-align: center;
+      padding: 11px;
+    }
+
+    .about {
+      margin-top: 54px;
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      text-align: center;
+    }
+
+    footer {
+      background: var(--dark);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    footer a { color: white; }
+
+    @media (max-width: 500px) {
+      header { padding: 15px 18px; }
+      .hero { padding: 52px 20px; }
+      main { padding: 38px 16px; }
+      .section-heading h2 { font-size: 27px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      STRASSENHUNDE
+      <span>RUMÄNIEN IN NOT E.V.</span>
+    </div>
+    <a class="contact-link" href="#vermittlung">Zur Vermittlung ↓</a>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Tierschutz mit Herz</div>
+    <h1>Ein Zuhause verändert ein ganzes Leben.</h1>
+    <p>
+      Lerne unsere Schützlinge kennen und entdecke,
+      welcher Hund zu dir und deinem Leben passen könnte.
+      Jeder Hund verdient eine faire Chance.
+    </p>
+    <a class="button" href="#hunde">Unsere Hunde kennenlernen</a>
+  </section>
+
+  <main id="hunde">
+    <div class="section-heading">
+      <div class="eyebrow">Dein neuer bester Freund</div>
+      <h2>Unsere Hunde suchen ein Zuhause</h2>
+      <p>Jeder Hund hat seine eigene Geschichte.</p>
+    </div>
+
+    <div class="notice">
+      Dies ist unsere erste Designversion mit Platzhaltern.
+      Die echten Hunde und ihre geprüften Steckbriefe fügen
+      wir im nächsten Schritt hinzu.
+    </div>
+
+    <div class="dogs">
+      <article class="dog-card">
+        <div class="dog-photo" aria-label="Platzhalter für Hundefoto">🐕</div>
+        <div class="dog-info">
+          <span class="tag">Beispielhund</span>
+          <h3>Hund 1</h3>
+          <p>Hier ergänzen wir Alter, Geschlecht und Charakter.</p>
+          <a class="button" href="#vermittlung">Steckbrief folgt</a>
+        </div>
+      </article>
+
+      <article class="dog-card">
+        <div class="dog-photo" aria-label="Platzhalter für Hundefoto">🐕</div>
+        <div class="dog-info">
+          <span class="tag">Beispielhund</span>
+          <h3>Hund 2</h3>
+          <p>Hier ergänzen wir Alter, Geschlecht und Charakter.</p>
+          <a class="button" href="#vermittlung">Steckbrief folgt</a>
+        </div>
+      </article>
+
+      <article class="dog-card">
+        <div class="dog-photo" aria-label="Platzhalter für Hundefoto">🐶</div>
+        <div class="dog-info">
+          <span class="tag">Beispielhund</span>
+          <h3>Hund 3</h3>
+          <p>Hier ergänzen wir Alter, Geschlecht und Charakter.</p>
+          <a class="button" href="#vermittlung">Steckbrief folgt</a>
+        </div>
+      </article>
+    </div>
+
+    <section class="about" id="vermittlung">
+      <h2>Du möchtest einem Hund helfen?</h2>
+      <p>
+        Der Vermittlungsablauf und die Kontaktmöglichkeiten
+        werden hier ergänzt, sobald wir sie mit dem Verein
+        abgestimmt haben.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>Strassenhunde Rumänien in Not e.V.</strong></p>
+    <p>Mit Herz für Hunde, die eine zweite Chance verdienen.</p>
+    <p>Impressum und Datenschutzhinweise werden vor Veröffentlichung ergänzt.</p>
+  </footer>
+</body>
+</html>

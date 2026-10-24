@@ -14,6 +14,19 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_KEY
 );
   console.log("Supabase-Verbindung eingerichtet:", !!supabaseClient);
+  async function ladeHunde() {
+  const { data, error } = await supabaseClient
+    .from("hunde")
+    .select("*");
+
+  if (error) {
+    console.error("Fehler beim Laden:", error);
+  } else {
+    console.log("Unsere Hunde:", data);
+  }
+}
+
+ladeHunde();
 </script>
 
 <style>

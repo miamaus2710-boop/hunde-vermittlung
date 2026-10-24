@@ -130,7 +130,12 @@ ladeHunde();
     karte.className = "hund";
     karte.dataset.name = hund.name || "";
     karte.dataset.status = hund.vermittlungsstatus || "";
-
+if (hund.fotos && hund.fotos.length > 0) {
+  const bild = document.createElement("img");
+  bild.src = hund.fotos[0];
+  bild.alt = "Foto von " + hund.name;
+  karte.append(bild);
+}
     const inhalt = document.createElement("div");
     inhalt.className = "inhalt";
 

@@ -104,7 +104,7 @@ header p {
 
   <main>
     <h2>Unsere Schützlinge</h2>
-    <div class="filter">
+    <div class="filter" id="hundefilter">
       <input id="suche" placeholder="Hund suchen..." oninput="filtern()">
       <select id="status" onchange="filtern()">
         <option value="">Alle Hunde</option>
@@ -185,6 +185,7 @@ function zeigeHund(hund) {
   const liste = document.getElementById("hundeliste");
 
   liste.style.display = "none";
+  document.getElementById("hundefilter").style.display = "none";
   details.hidden = false;
 
   details.innerHTML = "";
@@ -202,6 +203,7 @@ zurueck.style.cursor = "pointer";
   zurueck.onclick = () => {
     details.hidden = true;
     liste.style.display = "";
+    document.getElementById("hundefilter").style.display = "";
   };
   details.append(zurueck);
 if (hund.fotos && hund.fotos.length > 0) {

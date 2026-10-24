@@ -141,7 +141,17 @@ ladeHunde();
     status.className = "status";
     status.textContent = hund.vermittlungsstatus || "";
 
-    inhalt.append(name, status);
+    const alter = document.createElement("p");
+alter.textContent = "Alter: " + (hund.alter ?? "Keine Angabe");
+
+const geschlecht = document.createElement("p");
+geschlecht.textContent = "Geschlecht: " + (hund.geschlecht || "Keine Angabe");
+
+const beschreibung = document.createElement("p");
+beschreibung.textContent = hund.beschreibung || "";
+
+
+    inhalt.append(name, status, alter, geschlecht, beschreibung);
     karte.append(inhalt);
     liste.append(karte);
   });

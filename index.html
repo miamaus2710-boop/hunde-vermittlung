@@ -130,6 +130,90 @@ header p {
   <p>Hier können berechtigte Mitarbeiter später Hunde verwalten.</p>
   <button id="hund-hinzufuegen">➕ Neuen Hund hinzufügen</button>
   <div id="verwaltungs-inhalt"></div>
+    <div id="hunde-formular" hidden>
+  <h3>🐶 Neuen Hund eintragen</h3>
+
+  <label>Name</label>
+  <input id="hund-name" placeholder="Name des Hundes">
+
+  <label>Geburtsdatum</label>
+  <input id="hund-geburtsdatum" type="date">
+
+  <label>Geschlecht</label>
+  <select id="hund-geschlecht">
+    <option value="">Bitte auswählen</option>
+    <option>Rüde</option>
+    <option>Hündin</option>
+  </select>
+
+  <label>Aufenthaltsort</label>
+  <select id="hund-aufenthaltsort">
+    <option>Rumänien</option>
+    <option>Deutschland</option>
+  </select>
+
+  <label>Schulterhöhe (cm)</label>
+  <input id="hund-groesse" type="number" placeholder="z. B. 45">
+
+  <label>Gewicht (kg)</label>
+  <input id="hund-gewicht" type="number" step="0.1" placeholder="z. B. 16.5">
+
+  <label>Geimpft</label>
+  <select id="hund-geimpft">
+    <option>Unbekannt</option>
+    <option>Ja</option>
+    <option>Nein</option>
+  </select>
+
+  <label>Gechipt</label>
+  <select id="hund-gechipt">
+    <option>Unbekannt</option>
+    <option>Ja</option>
+    <option>Nein</option>
+  </select>
+
+  <label>Kastriert</label>
+  <select id="hund-kastriert">
+    <option>Unbekannt</option>
+    <option>Ja</option>
+    <option>Nein</option>
+  </select>
+
+  <label>Vermittlungsstatus</label>
+  <select id="hund-status">
+    <option>Vermittelbar</option>
+    <option>Reserviert</option>
+    <option>Ausgereist</option>
+  </select>
+
+  <label>Beschreibung</label>
+  <textarea id="hund-beschreibung"
+    placeholder="Beschreibe den Hund..."></textarea>
+
+  <button id="hund-speichern">
+    💾 Hund speichern
+  </button>
+
+  <p id="speicher-meldung"></p>
+</div>
+    <div id="hunde-formular" hidden>
+  <h3>🐶 Neuen Hund eintragen</h3>
+
+  <input id="hund-name" placeholder="Name des Hundes">
+  <input id="hund-alter" placeholder="Alter">
+  <input id="hund-geschlecht" placeholder="Geschlecht">
+
+  <select id="hund-status">
+    <option>Vermittelbar</option>
+    <option>Reserviert</option>
+    <option>Ausgereist</option>
+  </select>
+
+  <textarea id="hund-beschreibung" placeholder="Beschreibung des Hundes"></textarea>
+
+  <button id="hund-speichern">💾 Hund speichern</button>
+  <p id="speicher-meldung"></p>
+</div>
 </section>
 
   <script>
@@ -286,6 +370,9 @@ if (rollenFehler || !mitarbeiter ||
   document.getElementById("verwaltung").hidden = false;
 }
   }
+};
+    document.getElementById("hund-hinzufuegen").onclick = () => {
+  document.getElementById("hunde-formular").hidden = false;
 };
   </script>
 </body>

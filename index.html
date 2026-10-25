@@ -397,7 +397,7 @@ header p {
       });
     }
 
-    async function ladeHunde() {
+    async function aktualisiereHundekarten() {
   const { data, error } = await supabaseClient
     .from("hunde")
     .select("*");
@@ -712,13 +712,13 @@ wertSetzen("hund-raum-nummer", hund.raum_nummer);
   details.hidden = true;
   document.getElementById("hundefilter").style.display = "";
   document.getElementById("hundeliste").style.display = "";
-  await ladeHunde();
+ await aktualisiereHundekarten();
 };
 
   details.append(bearbeiten, loeschen);
 });
 }
-ladeHunde();
+aktualisiereHundekarten();
     document.getElementById("login-button").onclick = async () => {
   const email = document.getElementById("login-email").value.trim();
   const passwort = document.getElementById("login-passwort").value;
@@ -908,7 +908,7 @@ const restzeit = Math.max(0, 2000 - (Date.now() - ladeStart));
 await new Promise(resolve => setTimeout(resolve, restzeit));
 ladeAnzeige.remove();
 
-  await ladeHunde();
+  await aktualisiereHundekarten();
   window.bearbeiteHundId = null;
 
 document.getElementById("hunde-formular").hidden = true;

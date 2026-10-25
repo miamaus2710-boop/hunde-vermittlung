@@ -362,16 +362,58 @@ zurueck.style.cursor = "pointer";
   };
   details.append(zurueck);
 if (hund.fotos && hund.fotos.length > 0) {
-  const bild = document.createElement("img");
-  bild.src = hund.fotos[0];
-  bild.alt = "Foto von " + hund.name;
-  bild.style.width = "100%";
-  bild.style.maxWidth = "450px";
-  bild.style.height = "auto";
-  bild.style.display = "block";
-  bild.style.margin = "20px 0";
+  const galerie = document.createElement("div");
+  galerie.style.display = "flex";
+  galerie.style.flexWrap = "wrap";
+  galerie.style.gap = "12px";
+  galerie.style.margin = "20px 0";
+  galerie.style.alignItems = "flex-start";
 
-  details.append(bild);
+  const hauptbild = document.createElement("img");
+  hauptbild.src = hund.fotos[0];
+  hauptbild.alt = "Foto von " + hund.name;
+  hauptbild.style.width = "100%";
+  hauptbild.style.maxWidth = "450px";
+  hauptbild.style.height = "350px";
+  hauptbild.style.objectFit = "contain";
+  hauptbild.style.borderRadius = "12px";
+  hauptbild.style.backgroundColor = "#f1f5f9";
+
+  const vorschauen = document.createElement("div");
+  vorschauen.style.display = "flex";
+  vorschauen.style.flexDirection = "column";
+  vorschauen.style.gap = "10px";
+  vorschauen.style.maxHeight = "350px";
+  vorschauen.style.overflowY = "auto";
+
+  hund.fotos.forEach((foto, index) => {
+    const mini = document.createElement("img");
+    mini.src = foto;
+    mini.alt = "Foto " + (index + 1);
+    mini.style.width = "85px";
+    mini.style.height = "75px";
+    mini.style.objectFit = "cover";
+    mini.style.borderRadius = "8px";
+    mini.style.cursor = "pointer";
+    mini.style.border = index === 0
+      ? "3px solid #8DE0FE"
+      : "3px solid transparent";
+
+    mini.onclick = () => {
+      hauptbild.src = foto;
+
+      vorschauen.querySelectorAll("img").forEach(bild => {
+        bild.style.border = "3px solid transparent";
+      });
+
+      mini.style.border = "3px solid #8DE0FE";
+    };
+
+    vorschauen.append(mini);
+  });
+
+  galerie.append(hauptbild, vorschauen);
+  details.append(galerie);
 }
   const titel = document.createElement("h2");
   titel.textContent = hund.name;

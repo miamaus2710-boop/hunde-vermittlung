@@ -371,6 +371,15 @@ if (hund.fotos && hund.fotos.length > 0) {
   galerie.style.alignItems = "center";
 
   let aktuellesBild = 0;
+  const bildbereich = document.createElement("div");
+bildbereich.style.width = "700px";
+bildbereich.style.maxWidth = "100%";
+bildbereich.style.height = "500px";
+bildbereich.style.display = "flex";
+bildbereich.style.alignItems = "center";
+bildbereich.style.justifyContent = "center";
+bildbereich.style.flexShrink = "1";
+bildbereich.style.minWidth = "0";
   const hauptbild = document.createElement("img");
   hauptbild.src = hund.fotos[0];
   function wechsleBild(richtung) {
@@ -378,10 +387,10 @@ if (hund.fotos && hund.fotos.length > 0) {
   hauptbild.src = hund.fotos[aktuellesBild];
 }
   hauptbild.alt = "Foto von " + hund.name;
-  hauptbild.style.width = "auto";
+  hauptbild.style.width = "100%";
   hauptbild.style.maxHeight = "500px";
   hauptbild.style.maxWidth = "700px";
-  hauptbild.style.height = "auto";
+  hauptbild.style.height = "100%";
   hauptbild.style.objectFit = "contain";
 hauptbild.style.objectPosition = "left center";
   hauptbild.style.borderRadius = "12px";
@@ -442,7 +451,8 @@ pfeilRechts.onclick = () => wechsleBild(1);
     vorschauen.append(mini);
   });
 
- galerie.append(pfeilLinks, hauptbild, pfeilRechts, vorschauen);
+bildbereich.append(hauptbild);
+galerie.append(pfeilLinks, bildbereich, pfeilRechts, vorschauen);
   details.append(galerie);
 }
   const titel = document.createElement("h2");

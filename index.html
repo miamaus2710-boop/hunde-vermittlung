@@ -277,6 +277,7 @@ header p {
 </section>
 
   <script>
+    let hundInBearbeitung = null;
     function filtern() {
       const suche = document.getElementById("suche").value.toLowerCase();
       const status = document.getElementById("status").value;
@@ -523,7 +524,39 @@ details.append(anfrage);
   supabaseClient.auth.getUser().then(({ data }) => {
   if (!data.user) return;
 
-  const loeschen = document.createElement("button");
+  const bearbeiten = document.createElement("button");
+bearbeiten.textContent = "✏️ Hund bearbeiten";
+bearbeiten.type = "button";
+bearbeiten.style.backgroundColor = "#BDE0FE";
+bearbeiten.style.color = "#17324D";
+bearbeiten.style.border = "none";
+bearbeiten.style.borderRadius = "12px";
+bearbeiten.style.padding = "12px 20px";
+bearbeiten.style.margin = "15px 10px 0 0";
+bearbeiten.style.cursor = "pointer";
+    bearbeiten.onclick = () => {
+  hundInBearbeitung = hund.id;
+
+  const wertSetzen = (id, wert) => {
+    document.getElementById(id).value = wert ?? "";
+  };
+
+  wertSetzen("hund-name", hund.name);
+  wertSetzen("hund-geburtsdatum", hund.geburtsdatum);
+  wertSetzen("hund-geschlecht", hund.geschlecht);
+  wertSetzen("hund-aufenthaltsort", hund.aufenthaltsort);
+  wertSetzen("hund-groesse", hund.groesse);
+  wertSetzen("hund-gewicht", hund.gewicht);
+  wertSetzen("hund-geimpft", hund.geimpft);
+  wertSetzen("hund-gechippt", hund.gechippt);
+  wertSetzen("hund-kastriert", hund.kastriert);
+  wertSetzen("hund-status", hund.status);
+  wertSetzen("hund-beschreibung", hund.beschreibung);
+
+  document.getElementById("hund-formular").hidden = false;
+  document.getElementById("verwaltung").hidden = false;
+};
+    const loeschen = document.createElement("button");
   loeschen.textContent = "🗑️ Hund löschen";
   loeschen.type = "button";
   loeschen.style.backgroundColor = "#ffdddd";
@@ -565,7 +598,7 @@ details.append(anfrage);
   await ladeHunde();
 };
 
-  details.append(loeschen);
+  details.append(bearbeiten, loeschen);
 });
 }
 ladeHunde();
@@ -686,10 +719,33 @@ for (const datei of dateien) {
   fotoUrls.push(data.publicUrl);
 }
 
-hund.fotos = fotoUrls;
-  const { error } = await supabaseClient
-  .from("hunde")
-  .insert([hund]);
+if (window.bearbeiteHundId) {
+  const { data: vorhandenerHund, error: ladeFehler } = await supabaseClient
+    .from("hunde")
+    .select("fotos")
+    .eq("id", window.bearbeiteHundId)
+    .single();
+
+  if (ladeFehler) {
+    ladeAnzeige.remove();
+    meldung.textContent = "Fehler: " + ladeFehler.message;
+    meldung.style.display = "block";
+    return;
+  }
+
+  hund.fotos = [...(vorhandenerHund.fotos || []), ...fotoUrls];
+} else {
+  hund.fotos = fotoUrls;
+}
+
+const { error } = window.bearbeiteHundId
+  ? await supabaseClient
+      .from("hunde")
+      .update(hund)
+      .eq("id", window.bearbeiteHundId)
+  : await supabaseClient
+      .from("hunde")
+      .insert([hund]);
 
 if (error) {
   ladeAnzeige.remove();

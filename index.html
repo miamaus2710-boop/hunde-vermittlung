@@ -368,10 +368,15 @@ if (hund.fotos && hund.fotos.length > 0) {
   galerie.style.flexWrap = "wrap";
   galerie.style.gap = "8px";
   galerie.style.margin = "20px 0";
-  galerie.style.alignItems = "flex-start";
+  galerie.style.alignItems = "center";
 
+  let aktuellesBild = 0;
   const hauptbild = document.createElement("img");
   hauptbild.src = hund.fotos[0];
+  function wechsleBild(richtung) {
+  aktuellesBild = (aktuellesBild + richtung + hund.fotos.length) % hund.fotos.length;
+  hauptbild.src = hund.fotos[aktuellesBild];
+}
   hauptbild.alt = "Foto von " + hund.name;
   hauptbild.style.width = "auto";
   hauptbild.style.maxHeight = "500px";
@@ -382,6 +387,28 @@ hauptbild.style.objectPosition = "left center";
   hauptbild.style.borderRadius = "12px";
   hauptbild.style.backgroundColor = "#f1f5f9";
 
+  const pfeilLinks = document.createElement("button");
+pfeilLinks.textContent = "❮";
+pfeilLinks.style.backgroundColor = "#BDE0FE";
+pfeilLinks.style.color = "#17324D";
+pfeilLinks.style.border = "none";
+pfeilLinks.style.borderRadius = "50%";
+pfeilLinks.style.width = "44px";
+pfeilLinks.style.height = "44px";
+pfeilLinks.style.fontSize = "24px";
+pfeilLinks.style.cursor = "pointer";
+pfeilLinks.onclick = () => wechsleBild(-1);
+  const pfeilRechts = document.createElement("button");
+pfeilRechts.textContent = "❯";
+pfeilRechts.style.backgroundColor = "#BDE0FE";
+pfeilRechts.style.color = "#17324D";
+pfeilRechts.style.border = "none";
+pfeilRechts.style.borderRadius = "50%";
+pfeilRechts.style.width = "44px";
+pfeilRechts.style.height = "44px";
+pfeilRechts.style.fontSize = "24px";
+pfeilRechts.style.cursor = "pointer";
+pfeilRechts.onclick = () => wechsleBild(1);
   const vorschauen = document.createElement("div");
   vorschauen.style.display = "flex";
   vorschauen.style.flexDirection = "column";
@@ -415,7 +442,7 @@ hauptbild.style.objectPosition = "left center";
     vorschauen.append(mini);
   });
 
-  galerie.append(hauptbild, vorschauen);
+ galerie.append(pfeilLinks, hauptbild, pfeilRechts, vorschauen);
   details.append(galerie);
 }
   const titel = document.createElement("h2");

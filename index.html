@@ -131,24 +131,55 @@ header p {
       border-radius: 8px;
       margin: 5px;
     }
-    .hunde {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 320px));
-      gap: 20px;
-    }
-    .hund {
-      background: white;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 3px 12px #0002;
-    }
-    .hund img {
-      width: 100%;
-      height: 350px;
-      object-fit: contain;
-    }
+.hunde {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  gap: 26px;
+  align-items: stretch;
+}
+
+.hund {
+  background: #fffaf5;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(70, 45, 30, 0.13);
+  border: 1px solid rgba(120, 90, 65, 0.10);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hund:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 38px rgba(70, 45, 30, 0.20);
+}
+
+.hund img {
+  display: block;
+  width: 100%;
+  height: 310px;
+  object-fit: cover;
+  object-position: center;
+}
     .inhalt { padding: 20px; }
-    .status { color: #28734c; font-weight: bold; }
+    .status {
+  display: inline-block;
+  width: fit-content;
+  padding: 8px 15px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 800;
+  background: #dceaff;
+  color: #225c9e;
+}
+
+.status.reserviert {
+  background: #fff0c9;
+  color: #956000;
+}
+
+.status.ausgereist {
+  background: #e0f0df;
+  color: #347343;
+}
     .button {
       display: inline-block;
       padding: 12px 18px;
@@ -455,8 +486,21 @@ if (hund.fotos && hund.fotos.length > 0) {
     name.textContent = hund.name || "Unbekannt";
 
     const status = document.createElement("p");
-    status.className = "status";
-    status.textContent = hund.vermittlungsstatus || "";
+   status.className = "status";
+
+const hundStatus = hund.status || "";
+
+status.textContent =
+  hundStatus === "Reserviert" ? "❤️ Reserviert" :
+  hundStatus === "Ausgereist" ? "✈️ Ausgereist" :
+  hundStatus === "Vermittelbar" ? "🐾 Vermittelbar" :
+  hundStatus;
+
+if (hundStatus === "Reserviert") {
+  status.classList.add("reserviert");
+} else if (hundStatus === "Ausgereist") {
+  status.classList.add("ausgereist");
+}
 
     const alter = document.createElement("p");
 alter.textContent = "Alter: " + (hund.alter ?? "Keine Angabe");

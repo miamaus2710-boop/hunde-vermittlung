@@ -643,6 +643,7 @@ bearbeiten.style.margin = "15px 10px 0 0";
 bearbeiten.style.cursor = "pointer";
     bearbeiten.onclick = () => {
   hundInBearbeitung = hund.id;
+window.bearbeiteHundId = hund.id;
       document.getElementById("formular-titel").textContent = "✏️ Hund bearbeiten – " + hund.name;
 
   const wertSetzen = (id, wert) => {

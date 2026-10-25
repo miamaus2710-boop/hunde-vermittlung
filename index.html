@@ -267,8 +267,7 @@ header p {
   </button>
 
   <p id="speicher-meldung"></p>
-      <h3>🗑️ Hund löschen</h3>
-<div id="hunde-loeschliste"></div>
+
 </div>
     
 </section>
@@ -334,52 +333,7 @@ beschreibung.textContent = hund.beschreibung || "";
     karte.append(inhalt);
     liste.append(karte);
   });
-      const loeschliste = document.getElementById("hunde-loeschliste");
-loeschliste.innerHTML = "";
-      data.forEach(hund => {
-  const eintrag = document.createElement("div");
-  const name = document.createElement("span");
-  name.textContent = hund.name + " ";
 
-  const knopf = document.createElement("button");
-  knopf.textContent = "🗑️ Löschen";
-  knopf.type = "button";
-knopf.onclick = async () => {
-  const bestaetigt = confirm(
-    "Möchtest du " + hund.name + " wirklich löschen?"
-  );
-
-  if (!bestaetigt) return;
-
-  const { data: { user }, error: authFehler } =
-    await supabaseClient.auth.getUser();
-
-  if (authFehler || !user) {
-    alert("Bitte zuerst als Mitarbeiter anmelden.");
-    return;
-  }
-
-  const { data: geloescht, error } = await supabaseClient
-    .from("hunde")
-    .delete()
-    .eq("id", hund.id)
-    .select("id");
-
-  if (error) {
-    alert("Fehler beim Löschen: " + error.message);
-    return;
-  }
-
-  if (!geloescht || geloescht.length === 0) {
-    alert("Löschen nicht erlaubt. Bitte Mitarbeiterrechte prüfen.");
-    return;
-  }
-
-  await ladeHunde();
-};
-  eintrag.append(name, knopf);
-  loeschliste.append(eintrag);
-});
 }
 function zeigeHund(hund) {
   const details = document.getElementById("hundedetails");
@@ -441,6 +395,53 @@ anfrage.style.marginTop = "20px";
 }
 
 details.append(anfrage);
+  supabaseClient.auth.getUser().then(({ data }) => {
+  if (!data.user) return;
+
+  const loeschen = document.createElement("button");
+  loeschen.textContent = "🗑️ Hund löschen";
+  loeschen.type = "button";
+  loeschen.style.backgroundColor = "#ffdddd";
+  loeschen.style.border = "none";
+  loeschen.style.borderRadius = "12px";
+  loeschen.style.padding = "12px 20px";
+  loeschen.style.margin = "15px";
+  loeschen.style.cursor = "pointer";
+    loeschen.onclick = async () => {
+  if (!confirm("Möchtest du " + hund.name + " wirklich löschen?")) return;
+
+  const { data: { user }, error: authFehler } =
+    await supabaseClient.auth.getUser();
+
+  if (authFehler || !user) {
+    alert("Bitte als Mitarbeiter anmelden.");
+    return;
+  }
+
+  const { data: geloescht, error } = await supabaseClient
+    .from("hunde")
+    .delete()
+    .eq("id", hund.id)
+    .select("id");
+
+  if (error) {
+    alert("Fehler beim Löschen: " + error.message);
+    return;
+  }
+
+  if (!geloescht || geloescht.length === 0) {
+    alert("Löschen nicht erlaubt.");
+    return;
+  }
+
+  details.hidden = true;
+  document.getElementById("hundefilter").style.display = "";
+  document.getElementById("hundeliste").style.display = "";
+  await ladeHunde();
+};
+
+  details.append(loeschen);
+});
 }
 ladeHunde();
     document.getElementById("login-button").onclick = async () => {

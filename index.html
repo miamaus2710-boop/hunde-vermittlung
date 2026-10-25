@@ -211,6 +211,39 @@ header p {
     max-height: 94vh !important;
   }
 }
+/* Interne Unterbringung */
+.interne-unterbringung {
+  margin: 24px 0;
+  padding: 22px;
+  background: linear-gradient(135deg, #243b55, #304d70);
+  border: 1px solid #52799d;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.interne-unterbringung h3 {
+  color: #aee9ff;
+  font-size: 20px;
+  margin: 0 0 18px;
+}
+
+.interne-unterbringung label {
+  display: block;
+  margin: 12px 0 6px;
+  color: #e4f2ff;
+  font-weight: 600;
+}
+
+.interne-unterbringung input,
+.interne-unterbringung select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px;
+  border-radius: 10px;
+  border: 1px solid #6385a6;
+  background: #344f70;
+  color: white;
+}
 </style>
 </head>
 <body>
@@ -276,7 +309,31 @@ header p {
     <option>Rumänien</option>
     <option>Deutschland</option>
   </select>
+<div class="interne-unterbringung">
+  <h3>🏠 Interne Unterbringung</h3>
 
+  <label for="hund-arche">Standort</label>
+  <select id="hund-arche">
+    <option value="">Bitte auswählen</option>
+    <option value="Arche 1">Arche 1</option>
+    <option value="Arche 2">Arche 2</option>
+  </select>
+
+  <label for="hund-unterbringungsart">Unterbringung</label>
+  <select id="hund-unterbringungsart">
+    <option value="">Bitte auswählen</option>
+    <option value="Zwinger">Zwinger</option>
+    <option value="Quarantäne">Quarantäne</option>
+    <option value="Sonstiges">Sonstiges</option>
+  </select>
+
+  <label for="hund-raum-nummer">Zwinger / Raum</label>
+  <input
+    id="hund-raum-nummer"
+    type="text"
+    placeholder="z. B. 12A oder Quarantäne 3"
+  >
+</div>
   <label>Schulterhöhe (cm)</label>
   <input id="hund-groesse" type="number" placeholder="z. B. 45">
 
@@ -597,6 +654,9 @@ if (feld) feld.value = wert ?? "";
   wertSetzen("hund-geburtsdatum", hund.geburtsdatum);
   wertSetzen("hund-geschlecht", hund.geschlecht);
   wertSetzen("hund-aufenthaltsort", hund.aufenthaltsort);
+      wertSetzen("hund-arche", hund.arche);
+wertSetzen("hund-unterbringungsart", hund.unterbringungsart);
+wertSetzen("hund-raum-nummer", hund.raum_nummer);
   wertSetzen("hund-groesse", hund.groesse);
   wertSetzen("hund-gewicht", hund.gewicht);
   wertSetzen("hund-geimpft", hund.geimpft);
@@ -751,7 +811,11 @@ const ladeStart = Date.now();
     status: wert("hund-status"),
     beschreibung: wert("hund-beschreibung")
   };
-  
+  const standortDaten = {
+  arche: wert("hund-arche") || null,
+  unterbringungsart: wert("hund-unterbringungsart") || null,
+  raum_nummer: wert("hund-raum-nummer") || null
+};
   const dateien = document.getElementById("hund-fotos").files;
 const fotoUrls = [];
 
@@ -795,14 +859,17 @@ if (window.bearbeiteHundId) {
   hund.fotos = fotoUrls;
 }
 
-const { error } = window.bearbeiteHundId
-  ? await supabaseClient
-      .from("hunde")
-      .update(hund)
-      .eq("id", window.bearbeiteHundId)
-  : await supabaseClient
-      .from("hunde")
-      .insert([hund]);
+const { data: gespeicherteHunde, error } =
+  window.bearbeiteHundId
+    ? await supabaseClient
+        .from("hunde")
+        .update(hund)
+        .eq("id", window.bearbeiteHundId)
+        .select("id")
+    : await supabaseClient
+        .from("hunde")
+        .insert([hund])
+        .select("id");
 
 if (error) {
   ladeAnzeige.remove();
@@ -810,7 +877,28 @@ if (error) {
   meldung.textContent = "Fehler: " + error.message;
   return;
 }
+const hundId = gespeicherteHunde?.[0]?.id;
 
+if (!hundId) {
+  ladeAnzeige.remove();
+  meldung.style.display = "block";
+  meldung.textContent = "Fehler: Hunde-ID fehlt.";
+  return;
+}
+
+const { error: standortFehler } = await supabaseClient
+  .from("hunde_standorte")
+  .upsert({
+    hund_id: hundId,
+    ...standortDaten
+  }, { onConflict: "hund_id" });
+
+if (standortFehler) {
+  ladeAnzeige.remove();
+  meldung.style.display = "block";
+  meldung.textContent = "Standort konnte nicht gespeichert werden: " + standortFehler.message;
+  return;
+}
 const restzeit = Math.max(0, 2000 - (Date.now() - ladeStart));
 await new Promise(resolve => setTimeout(resolve, restzeit));
 ladeAnzeige.remove();

@@ -364,8 +364,9 @@ zurueck.style.cursor = "pointer";
 if (hund.fotos && hund.fotos.length > 0) {
   const galerie = document.createElement("div");
   galerie.style.display = "flex";
+  galerie.style.justifyContent = "flex-start";
   galerie.style.flexWrap = "wrap";
-  galerie.style.gap = "12px";
+  galerie.style.gap = "8px";
   galerie.style.margin = "20px 0";
   galerie.style.alignItems = "flex-start";
 
@@ -375,7 +376,7 @@ if (hund.fotos && hund.fotos.length > 0) {
   hauptbild.style.width = "100%";
   hauptbild.style.maxWidth = "700px";
   hauptbild.style.height = "500px";
-  hauptbild.style.objectFit = "contain";
+  hauptbild.style.objectFit = "left center";
   hauptbild.style.borderRadius = "12px";
   hauptbild.style.backgroundColor = "#f1f5f9";
 

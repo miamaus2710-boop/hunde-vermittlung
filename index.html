@@ -369,7 +369,16 @@ header p {
     <option>Reserviert</option>
     <option>Ausgereist</option>
   </select>
-
+<div style="margin:20px 0; padding:16px; background:#344b65; border-radius:12px; color:white;">
+  <label for="hund-sichtbar" style="display:flex; align-items:center; gap:12px; cursor:pointer; margin:0;">
+    <input type="checkbox" id="hund-sichtbar" style="width:22px; height:22px; accent-color:#8bd0ef;">
+    🌍 Öffentlich sichtbar
+  </label>
+  <small style="display:block; margin-top:8px; color:#d0e4f5;">
+    Aktiviert: Besucher können diesen Hund sehen.
+    Deaktiviert: Nur berechtigte Mitarbeiter können ihn sehen.
+  </small>
+</div>
   <label>Beschreibung</label>
   <textarea id="hund-beschreibung"
     placeholder="Beschreibe den Hund..."></textarea>
@@ -725,6 +734,7 @@ wertSetzen("hund-raum-nummer", hund.raum_nummer);
   wertSetzen("hund-gechipt", hund.gechipt);
   wertSetzen("hund-kastriert", hund.kastriert);
   wertSetzen("hund-status", hund.status);
+   document.getElementById("hund-sichtbar").checked = hund.sichtbar === true;   
   wertSetzen("hund-beschreibung", hund.beschreibung);
 
   document.getElementById("hunde-formular").hidden = false;
@@ -815,6 +825,7 @@ document.getElementById("hund-hinzufuegen").onclick = () => {
 window.bearbeiteHundId = null;
 document.getElementById("formular-titel").textContent = "🐾 Neuen Hund eintragen";
   formular.querySelectorAll("input:not([type=file]), textarea").forEach(feld => feld.value = "");
+  document.getElementById("hund-sichtbar").checked = true;
   formular.hidden = false;
 };
     async function anmeldungWiederherstellen() {
@@ -873,7 +884,8 @@ const ladeStart = Date.now();
     gechipt: wert("hund-gechipt"),
     kastriert: wert("hund-kastriert"),
     status: wert("hund-status"),
-    beschreibung: wert("hund-beschreibung")
+sichtbar: document.getElementById("hund-sichtbar").checked,
+beschreibung: wert("hund-beschreibung")
   };
   const standortDaten = {
   arche: wert("hund-arche") || null,

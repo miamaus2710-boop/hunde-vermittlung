@@ -373,10 +373,12 @@ if (hund.fotos && hund.fotos.length > 0) {
   const hauptbild = document.createElement("img");
   hauptbild.src = hund.fotos[0];
   hauptbild.alt = "Foto von " + hund.name;
-  hauptbild.style.width = "100%";
+  hauptbild.style.width = "auto";
+  hauptbild.style.maxHeight = "500px";
   hauptbild.style.maxWidth = "700px";
-  hauptbild.style.height = "500px";
-  hauptbild.style.objectFit = "left center";
+  hauptbild.style.height = "auto";
+  hauptbild.style.objectFit = "contain";
+hauptbild.style.objectPosition = "left center";
   hauptbild.style.borderRadius = "12px";
   hauptbild.style.backgroundColor = "#f1f5f9";
 

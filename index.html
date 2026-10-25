@@ -894,6 +894,7 @@ function zeigeHund(hund) {
 
   liste.style.display = "none";
   document.getElementById("hundefilter").style.display = "none";
+  document.getElementById("filter-oeffnen").style.display = "none";
   details.hidden = false;
 
   details.innerHTML = "";
@@ -911,6 +912,7 @@ zurueck.style.cursor = "pointer";
   zurueck.onclick = () => {
     details.hidden = true;
     liste.style.display = "";
+    document.getElementById("filter-oeffnen").style.display = "";
     document.getElementById("hundefilter").style.display = "";
   };
   details.append(zurueck);

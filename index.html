@@ -654,6 +654,23 @@ supabaseClient.auth.getUser().then(async ({ data: { user }, error }) => {
     return;
   }
 
+  const { data: standort, error: standortFehler } = await supabaseClient
+  .from("hunde_standorte")
+  .select("arche, unterbringungsart, raum_nummer")
+  .eq("hund_id", hund.id)
+  .maybeSingle();
+
+if (standortFehler) {
+  console.error("Standort konnte nicht geladen werden:", standortFehler);
+} else if (standort) {
+  interneBox.innerHTML = `
+    <h3 style="margin:0 0 15px;">🏠 Interne Unterbringung</h3>
+    <p>📍 Standort: ${standort.arche || "Nicht zugewiesen"}</p>
+    <p>🏡 Unterbringung: ${standort.unterbringungsart || "Nicht zugewiesen"}</p>
+    <p>🔑 Zwinger / Raum: ${standort.raum_nummer || "Nicht zugewiesen"}</p>
+    <small>🔒 Nur für Mitarbeiter</small>
+  `;
+}
   datenBereich.append(interneBox);
 });
   details.append(titel, datenBereich, beschreibung);

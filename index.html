@@ -270,7 +270,7 @@ header p {
     💾 Hund speichern
   </button>
 
-  <p id="speicher-meldung"></p>
+  <p id="speicher-meldung" style="display:none;"></p>
 
 </div>
     
@@ -626,10 +626,11 @@ document.getElementById("hund-hinzufuegen").onclick = () => {
 }
 document.getElementById("hund-speichern").onclick = async () => {
   const meldung = document.getElementById("speicher-meldung");
-  meldung.innerHTML = `
+meldung.innerHTML = `
   <span style="display:inline-block; animation: pfoteDrehen 1.2s linear infinite;">🐾</span>
   Hund wird gespeichert...
 `;
+meldung.style.display = "block";
   const wert = (id) => document.getElementById(id).value;
 
   const hund = {
@@ -683,6 +684,8 @@ if (error) {
 await ladeHunde();
 
 document.getElementById("hunde-formular").hidden = true;
+  meldung.style.display = "none";
+meldung.innerHTML = "";
 
 const bestaetigung = document.createElement("div");
 bestaetigung.textContent = "🐾 Hund erfolgreich gespeichert!";

@@ -909,6 +909,17 @@ await new Promise(resolve => setTimeout(resolve, restzeit));
 ladeAnzeige.remove();
 
   await aktualisiereHundekarten();
+  if (window.bearbeiteHundId) {
+  const { data: aktuellerHund, error: detailFehler } = await supabaseClient
+    .from("hunde")
+    .select("*")
+    .eq("id", window.bearbeiteHundId)
+    .single();
+
+  if (!detailFehler && aktuellerHund) {
+    zeigeHund(aktuellerHund);
+  }
+}
   window.bearbeiteHundId = null;
 
 document.getElementById("hunde-formular").hidden = true;

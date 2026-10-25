@@ -463,7 +463,44 @@ galerie.append(pfeilLinks, bildbereich, pfeilRechts, vorschauen);
   const beschreibung = document.createElement("p");
   beschreibung.textContent = hund.beschreibung || "";
 
-  details.append(titel, beschreibung);
+ const datenblatt = document.createElement("div");
+
+datenblatt.style.display = "grid";
+datenblatt.style.gridTemplateColumns = "repeat(auto-fit, minmax(180px, 1fr))";
+datenblatt.style.gap = "12px";
+datenblatt.style.margin = "20px 0";
+
+const angaben = [
+  ["Geburtsdatum", hund.geburtsdatum],
+  ["Geschlecht", hund.geschlecht],
+  ["Aufenthaltsort", hund.aufenthaltsort],
+  ["Größe", hund.groesse ? hund.groesse + " cm" : ""],
+  ["Gewicht", hund.gewicht ? hund.gewicht + " kg" : ""],
+  ["Geimpft", hund.geimpft],
+  ["Gechippt", hund.gechippt],
+  ["Kastriert", hund.kastriert],
+  ["Status", hund.status]
+];
+
+angaben.forEach(([bezeichnung, wert]) => {
+  const feld = document.createElement("div");
+  feld.style.backgroundColor = "#f1f5f9";
+  feld.style.padding = "12px";
+  feld.style.borderRadius = "10px";
+
+  const label = document.createElement("strong");
+  label.textContent = bezeichnung;
+
+  const inhalt = document.createElement("div");
+  inhalt.textContent = wert === null || wert === undefined || wert === ""
+    ? "Nicht angegeben"
+    : String(wert);
+
+  feld.append(label, inhalt);
+  datenblatt.append(feld);
+});
+
+details.append(titel, datenblatt, beschreibung);
   const anfrage = document.createElement("button");
 anfrage.textContent = "❤️ Anfrage für " + hund.name + " senden";
 anfrage.style.backgroundColor = "#BDE0FE";

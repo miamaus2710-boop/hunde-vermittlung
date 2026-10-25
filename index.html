@@ -703,7 +703,7 @@ header p {
     <option value="Sonstiges">Sonstiges</option>
   </select>
 
-  <label for="hund-raum-nummer">Zwinger / Raum / Garage</label>
+  <label for="hund-raum-nummer">Zwinger / Quarantäne / Garage</label>
   <input
     id="hund-raum-nummer"
     type="text"
@@ -1080,7 +1080,7 @@ interneBox.innerHTML = `
   <h3 style="margin:0 0 15px;">🏠 Interne Unterbringung</h3>
   <p>📍 Standort: Noch nicht zugewiesen</p>
   <p>🏡 Unterbringung: Noch nicht zugewiesen</p>
-<p>🔑 Zwinger / Raum / Garage: Noch nicht zugewiesen</p>
+<p>🔑 Zwinger / Quarantäne / Garage: Noch nicht zugewiesen</p>
   <small>🔒 Nur für Mitarbeiter</small>
 `;
 supabaseClient.auth.getUser().then(async ({ data: { user }, error }) => {
@@ -1109,7 +1109,7 @@ if (standortFehler) {
     <h3 style="margin:0 0 15px;">🏠 Interne Unterbringung</h3>
     <p>📍 Standort: ${standort.arche || "Nicht zugewiesen"}</p>
     <p>🏡 Unterbringung: ${standort.unterbringungsart || "Nicht zugewiesen"}</p>
-   <p>🔑 Zwinger / Raum / Garage: ${standort.raum_nummer || "Nicht zugewiesen"}</p>
+   <p>🔑 Zwinger / Quarantäne / Garage: ${standort.raum_nummer || "Nicht zugewiesen"}</p>
     <small>🔒 Nur für Mitarbeiter</small>
   `;
 }

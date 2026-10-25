@@ -517,6 +517,32 @@ document.getElementById("hund-speichern").onclick = async () => {
     status: wert("hund-status"),
     beschreibung: wert("hund-beschreibung")
   };
+  
+  const dateien = document.getElementById("hund-fotos").files;
+const fotoUrls = [];
+
+for (const datei of dateien) {
+  const dateiname = crypto.randomUUID() + "-" + datei.name;
+
+  const { error: uploadFehler } = await supabaseClient.storage
+    .from("hundefotos")
+    .upload(dateiname, datei, {
+      contentType: datei.type
+    });
+
+  if (uploadFehler) {
+    meldung.textContent = "Foto-Upload fehlgeschlagen: " + uploadFehler.message;
+    return;
+  }
+
+  const { data } = supabaseClient.storage
+    .from("hundefotos")
+    .getPublicUrl(dateiname);
+
+  fotoUrls.push(data.publicUrl);
+}
+
+hund.fotos = fotoUrls;
   const { error } = await supabaseClient
   .from("hunde")
   .insert([hund]);

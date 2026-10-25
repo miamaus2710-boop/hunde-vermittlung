@@ -751,6 +751,7 @@ if (rollenFehler || !mitarbeiter ||
 document.getElementById("hund-hinzufuegen").onclick = () => {
   const formular = document.getElementById("hunde-formular");
   hundInBearbeitung = null;
+window.bearbeiteHundId = null;
 document.getElementById("formular-titel").textContent = "🐾 Neuen Hund eintragen";
   formular.querySelectorAll("input:not([type=file]), textarea").forEach(feld => feld.value = "");
   formular.hidden = false;
@@ -776,6 +777,7 @@ document.getElementById("formular-titel").textContent = "🐾 Neuen Hund eintrag
     "Angemeldet als " + mitarbeiter.rolle;
 }
 document.getElementById("hund-speichern").onclick = async () => {
+  console.log("SPEICHERN – Hunde-ID:", window.bearbeiteHundId);
   const meldung = document.getElementById("speicher-meldung");
 const ladeAnzeige = document.createElement("div");
 ladeAnzeige.style.cssText = "position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;background:#ffffffb8;z-index:9999;";

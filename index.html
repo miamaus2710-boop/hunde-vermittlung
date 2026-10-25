@@ -162,6 +162,55 @@ header p {
   z-index: 9999;
   box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.65);
 }
+  /* Modernes Bearbeitungsfenster */
+#hunde-formular:not([hidden]) {
+  width: 96% !important;
+  max-width: 1100px !important;
+  max-height: 94vh !important;
+  padding: 30px !important;
+  background: #17283b !important;
+  color: #ffffff !important;
+  border-radius: 22px !important;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+}
+
+/* Eingabefelder */
+#hunde-formular input,
+#hunde-formular select,
+#hunde-formular textarea {
+  background: #263b50;
+  color: white;
+  border: 1px solid #49627a;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 16px;
+}
+
+/* Beschriftungen */
+#hunde-formular label {
+  color: #dceaff;
+  font-size: 15px;
+}
+
+/* Große Schaltflächen */
+#hunde-formular button {
+  background: #70c8f5;
+  color: #102235;
+  padding: 18px 28px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+/* Anpassung für Handys */
+@media (max-width: 600px) {
+  #hunde-formular:not([hidden]) {
+    width: 96% !important;
+    padding: 16px !important;
+    max-height: 94vh !important;
+  }
+}
 </style>
 </head>
 <body>

@@ -383,15 +383,15 @@ if (hund.fotos && hund.fotos.length > 0) {
   vorschauen.style.display = "flex";
   vorschauen.style.flexDirection = "column";
   vorschauen.style.gap = "10px";
-  vorschauen.style.maxHeight = "350px";
+  vorschauen.style.maxHeight = "500px";
   vorschauen.style.overflowY = "auto";
 
   hund.fotos.forEach((foto, index) => {
     const mini = document.createElement("img");
     mini.src = foto;
     mini.alt = "Foto " + (index + 1);
-    mini.style.width = "85px";
-    mini.style.height = "75px";
+    mini.style.width = "110px";
+    mini.style.height = "95px";
     mini.style.objectFit = "cover";
     mini.style.borderRadius = "8px";
     mini.style.cursor = "pointer";

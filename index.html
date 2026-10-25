@@ -135,6 +135,115 @@ header p {
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(35, 35, 40, 0.18);
 }
+  .filter[hidden] {
+  display: none !important;
+}
+  #hundefilter .filter-schliessen {
+  position: sticky;
+  top: 0;
+  align-self: flex-end;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  padding: 0;
+  margin-bottom: -8px;
+  background: #ffdddd;
+  color: #8b3030;
+  border: none;
+  border-radius: 50%;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 2;
+}
+
+#hundefilter .filter-schliessen:hover {
+  background: #ffbcbc;
+}
+  /* Modernes Filter-Pop-up */
+#hundefilter:not([hidden]) {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 90%;
+  max-width: 650px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+
+  padding: 30px;
+  margin: 0;
+  background: linear-gradient(145deg, #293b52, #405b79);
+  border: 1px solid #83bde8;
+  border-radius: 22px;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.65),
+              0 20px 60px rgba(0, 0, 0, 0.35);
+  z-index: 9000;
+}
+
+#hundefilter .filter-zusatz {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  width: 100%;
+}
+
+#hundefilter .filter-zusatz > div {
+  min-width: 0;
+}
+
+#hundefilter .filter-zusatz label {
+  display: block;
+  color: white;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+#hundefilter .filter-zusatz input,
+#hundefilter .filter-zusatz select {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 13px;
+  border-radius: 10px;
+  border: 1px solid #83bde8;
+  background: #354b65;
+  color: white;
+}
+
+#hundefilter .filter-suchen-button {
+  background: #8bd0ef;
+  color: #17324d;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#hundefilter .filter-reset {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  #hundefilter:not([hidden]) {
+    width: 94%;
+    padding: 18px;
+    max-height: 90vh;
+  }
+
+  #hundefilter .filter-zusatz {
+    grid-template-columns: 1fr;
+  }
+}
 
 .filter-suche {
   display: flex;
@@ -399,7 +508,22 @@ header p {
 
   <main>
     <h2>Unsere Schützlinge</h2>
-    <div class="filter" id="hundefilter">
+    <button
+  type="button"
+  id="filter-oeffnen"
+  onclick="document.getElementById('hundefilter').hidden = false;"
+>
+  🔍 Hunde filtern
+</button>
+   <div class="filter" id="hundefilter" hidden>
+     <button
+  type="button"
+  class="filter-schliessen"
+  onclick="document.getElementById('hundefilter').hidden = true;"
+  aria-label="Filterfenster schließen"
+>
+  ✕
+</button>
 
   <div class="filter-suche">
     <span>🔍</span>
@@ -416,14 +540,65 @@ header p {
     <option value="Reserviert">❤️ Reserviert</option>
     <option value="Ausgereist">✈️ Ausgereist</option>
   </select>
+     <div class="filter-zusatz">
 
-  <button type="button" class="filter-reset" onclick="
+  <div>
+    <label for="filter-alter">🐶 Alter</label>
+    <select id="filter-alter">
+      <option value="">Alle Altersgruppen</option>
+      <option value="0-1">Bis 1 Jahr</option>
+      <option value="1-3">1 bis 3 Jahre</option>
+      <option value="3-8">3 bis 8 Jahre</option>
+      <option value="8-100">Ab 8 Jahren</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="filter-geschlecht">🐾 Geschlecht</label>
+    <select id="filter-geschlecht">
+      <option value="">Alle Geschlechter</option>
+      <option value="Rüde">Rüde</option>
+      <option value="Hündin">Hündin</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="filter-groesse-von">📏 Größe von (cm)</label>
+    <input type="number" id="filter-groesse-von"
+           min="0" placeholder="z. B. 30">
+  </div>
+
+  <div>
+    <label for="filter-groesse-bis">📏 Größe bis (cm)</label>
+    <input type="number" id="filter-groesse-bis"
+           min="0" placeholder="z. B. 60">
+  </div>
+
+</div>
+     <button
+  type="button"
+  class="filter-suchen-button"
+  onclick="filtern(); document.getElementById('hundefilter').hidden = true;"
+>
+  🔍 Suche starten
+</button>
+
+  <button
+  type="button"
+  class="filter-reset"
+  onclick="
     document.getElementById('suche').value = '';
     document.getElementById('status').value = '';
+    document.getElementById('filter-alter').value = '';
+    document.getElementById('filter-geschlecht').value = '';
+    document.getElementById('filter-groesse-von').value = '';
+    document.getElementById('filter-groesse-bis').value = '';
     filtern();
-  ">
-    ↻ Filter zurücksetzen
-  </button>
+    document.getElementById('hundefilter').hidden = true;
+  "
+>
+  ↻ Alle Filter zurücksetzen
+</button>
 
 </div>
 
@@ -545,14 +720,55 @@ header p {
   <script>
     let hundInBearbeitung = null;
     function filtern() {
-      const suche = document.getElementById("suche").value.toLowerCase();
-      const status = document.getElementById("status").value;
-      document.querySelectorAll(".hund").forEach(hund => {
-        const passt = hund.dataset.name.includes(suche) &&
-          (!status || hund.dataset.status === status);
-        hund.style.display = passt ? "" : "none";
-      });
+  const suche = document.getElementById("suche").value.trim().toLowerCase();
+  const status = document.getElementById("status").value;
+  const alter = document.getElementById("filter-alter").value;
+  const geschlecht = document.getElementById("filter-geschlecht").value;
+  const groesseVon = document.getElementById("filter-groesse-von").value;
+  const groesseBis = document.getElementById("filter-groesse-bis").value;
+
+  document.querySelectorAll("#hundeliste .hund").forEach(hund => {
+    const namePasst = hund.dataset.name.toLowerCase().includes(suche);
+    const statusPasst = !status || hund.dataset.status === status;
+    const geschlechtPasst = !geschlecht || hund.dataset.geschlecht === geschlecht;
+
+    const groesse = Number(hund.dataset.groesse);
+    const groessePasst =
+      ((!groesseVon && !groesseBis) ||
+      (hund.dataset.groesse !== "" &&
+       (!groesseVon || groesse >= Number(groesseVon)) &&
+       (!groesseBis || groesse <= Number(groesseBis))));
+
+    let alterPasst = true;
+
+    if (alter) {
+      const geburtsdatum = hund.dataset.geburtsdatum;
+      alterPasst = false;
+
+      if (geburtsdatum) {
+        const geburt = new Date(geburtsdatum);
+        const heute = new Date();
+
+        if (!isNaN(geburt.getTime()) && geburt <= heute) {
+          const alterJahre =
+            (heute - geburt) / (1000 * 60 * 60 * 24 * 365.2425);
+
+          const [von, bis] = alter.split("-").map(Number);
+          alterPasst = alterJahre >= von && alterJahre < bis;
+        }
+      }
     }
+
+    const passt =
+      namePasst &&
+      statusPasst &&
+      geschlechtPasst &&
+      groessePasst &&
+      alterPasst;
+
+    hund.style.display = passt ? "" : "none";
+  });
+}
 
     async function aktualisiereHundekarten() {
   const { data, error } = await supabaseClient
@@ -573,7 +789,10 @@ header p {
     karte.style.cursor = "pointer";
 karte.addEventListener("click", () => zeigeHund(hund));
     karte.dataset.name = hund.name || "";
-    karte.dataset.status = hund.vermittlungsstatus || "";
+    karte.dataset.status = hund.status || "";
+    karte.dataset.geburtsdatum = hund.geburtsdatum || "";
+karte.dataset.geschlecht = hund.geschlecht || "";
+karte.dataset.groesse = hund.groesse ?? "";
 if (hund.fotos && hund.fotos.length > 0) {
   const bild = document.createElement("img");
   bild.src = hund.fotos[0];

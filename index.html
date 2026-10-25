@@ -614,7 +614,49 @@ angaben.forEach(([bezeichnung, wert]) => {
   datenblatt.append(feld);
 });
 
-details.append(titel, datenblatt, beschreibung);
+const datenBereich = document.createElement("div");
+datenBereich.style.cssText = `
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 20px;
+  align-items: start;
+`;
+
+datenBereich.append(datenblatt);
+const interneBox = document.createElement("div");
+
+interneBox.style.cssText = `
+  background: linear-gradient(145deg, #293b52, #405b79);
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  font-size: 14px;
+`;
+
+interneBox.innerHTML = `
+  <h3 style="margin:0 0 15px;">🏠 Interne Unterbringung</h3>
+  <p>📍 Standort: Noch nicht zugewiesen</p>
+  <p>🏡 Unterbringung: Noch nicht zugewiesen</p>
+  <p>🔑 Zwinger / Raum: Noch nicht zugewiesen</p>
+  <small>🔒 Nur für Mitarbeiter</small>
+`;
+supabaseClient.auth.getUser().then(async ({ data: { user }, error }) => {
+  if (error || !user) return;
+
+  const { data: mitarbeiter, error: rollenFehler } = await supabaseClient
+    .from("mitarbeiter")
+    .select("rolle")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (rollenFehler || !["admin", "mitarbeiter"].includes(mitarbeiter?.rolle)) {
+    return;
+  }
+
+  datenBereich.append(interneBox);
+});
+  details.append(titel, datenBereich, beschreibung);
   const anfrage = document.createElement("button");
 anfrage.textContent = "❤️ Anfrage für " + hund.name + " senden";
 anfrage.style.backgroundColor = "#BDE0FE";

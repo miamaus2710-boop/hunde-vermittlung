@@ -538,7 +538,8 @@ bearbeiten.style.cursor = "pointer";
   hundInBearbeitung = hund.id;
 
   const wertSetzen = (id, wert) => {
-    document.getElementById(id).value = wert ?? "";
+   const feld = document.getElementById(id);
+if (feld) feld.value = wert ?? "";
   };
 
   wertSetzen("hund-name", hund.name);

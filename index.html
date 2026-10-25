@@ -554,6 +554,7 @@ bearbeiten.style.cursor = "pointer";
   wertSetzen("hund-beschreibung", hund.beschreibung);
 
   document.getElementById("hund-formular").hidden = false;
+      document.getElementById("hund-formular").scrollIntoView({ behavior: "smooth", block: "center" });
   document.getElementById("verwaltung").hidden = false;
 };
   

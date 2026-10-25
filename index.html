@@ -566,6 +566,31 @@ bearbeiten.style.borderRadius = "12px";
 bearbeiten.style.padding = "12px 20px";
 bearbeiten.style.margin = "15px 10px 0 0";
 bearbeiten.style.cursor = "pointer";
+    bearbeiten.onclick = () => {
+  window.bearbeiteHundId = hund.id;
+
+  const felder = {
+    "hund-name": hund.name,
+    "hund-geburtsdatum": hund.geburtsdatum,
+    "hund-geschlecht": hund.geschlecht,
+    "hund-aufenthaltsort": hund.aufenthaltsort,
+    "hund-groesse": hund.groesse,
+    "hund-gewicht": hund.gewicht,
+    "hund-geimpft": hund.geimpft,
+    "hund-gechippt": hund.gechippt,
+    "hund-kastriert": hund.kastriert,
+    "hund-status": hund.status,
+    "hund-beschreibung": hund.beschreibung
+  };
+
+  Object.entries(felder).forEach(([id, wert]) => {
+    const feld = document.getElementById(id);
+    if (feld) feld.value = wert ?? "";
+  });
+
+  document.getElementById("hunde-formular").hidden = false;
+  document.getElementById("speicher-meldung").textContent = "";
+};
     const loeschen = document.createElement("button");
   loeschen.textContent = "🗑️ Hund löschen";
   loeschen.type = "button";

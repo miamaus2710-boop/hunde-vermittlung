@@ -626,11 +626,26 @@ document.getElementById("hund-hinzufuegen").onclick = () => {
 }
 document.getElementById("hund-speichern").onclick = async () => {
   const meldung = document.getElementById("speicher-meldung");
-meldung.innerHTML = `
-  <span style="display:inline-block; animation: pfoteDrehen 1.2s linear infinite;">🐾</span>
-  Hund wird gespeichert...
+const ladeAnzeige = document.createElement("div");
+ladeAnzeige.style.cssText = "position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;background:#ffffffb8;z-index:9999;";
+
+ladeAnzeige.innerHTML = `
+  <svg viewBox="0 0 100 100" width="85" height="85"
+       style="fill:#BDE0FE;animation:pfoteDrehen 1.2s linear infinite;">
+    <ellipse cx="50" cy="64" rx="25" ry="20"/>
+    <ellipse cx="19" cy="43" rx="9" ry="13" transform="rotate(-20 19 43)"/>
+    <ellipse cx="39" cy="25" rx="9" ry="13"/>
+    <ellipse cx="62" cy="25" rx="9" ry="13"/>
+    <ellipse cx="82" cy="43" rx="9" ry="13" transform="rotate(20 82 43)"/>
+  </svg>
+  <div style="color:#17324D;font-size:16px;">
+    Hund wird gespeichert...
+  </div>
 `;
-meldung.style.display = "block";
+
+document.body.append(ladeAnzeige);
+const ladeStart = Date.now();
+
   const wert = (id) => document.getElementById(id).value;
 
   const hund = {
@@ -677,11 +692,17 @@ hund.fotos = fotoUrls;
   .insert([hund]);
 
 if (error) {
+  ladeAnzeige.remove();
+  meldung.style.display = "block";
   meldung.textContent = "Fehler: " + error.message;
   return;
 }
 
-await ladeHunde();
+const restzeit = Math.max(0, 2000 - (Date.now() - ladeStart));
+await new Promise(resolve => setTimeout(resolve, restzeit));
+ladeAnzeige.remove();
+
+  await ladeHunde();
 
 document.getElementById("hunde-formular").hidden = true;
   meldung.style.display = "none";
@@ -692,7 +713,7 @@ bestaetigung.textContent = "🐾 Hund erfolgreich gespeichert!";
 bestaetigung.style.cssText = "position:fixed;top:25px;left:50%;transform:translateX(-50%);background:#BDE0FE;color:#17324D;padding:16px 28px;border-radius:12px;z-index:9999;box-shadow:0 4px 15px #0002;";
 document.body.append(bestaetigung);
 
-setTimeout(() => bestaetigung.remove(), 3000);
+setTimeout(() => bestaetigung.remove(), 2000);
   };
 anmeldungWiederherstellen();
 supabaseClient.auth.onAuthStateChange((event) => {

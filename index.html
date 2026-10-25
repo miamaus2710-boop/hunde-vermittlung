@@ -759,6 +759,7 @@ await new Promise(resolve => setTimeout(resolve, restzeit));
 ladeAnzeige.remove();
 
   await ladeHunde();
+  window.bearbeiteHundId = null;
 
 document.getElementById("hunde-formular").hidden = true;
   meldung.style.display = "none";

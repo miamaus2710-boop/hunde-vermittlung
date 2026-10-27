@@ -595,6 +595,13 @@ header p {
   >👁️</button>
 </div>
   <button id="login-button">Anmelden</button>
+    <button
+  type="button"
+  id="passwort-vergessen"
+  onclick="passwortVergessen()"
+>
+  Passwort vergessen?
+</button>
   <p id="login-meldung"></p>
 </div>
   <header>
@@ -1510,6 +1517,28 @@ document.getElementById("passwort-speichern").onclick = async () => {
     await supabaseClient.auth.signOut();
   }
 };
+
+    // Passwort-Zurücksetzung per E-Mail anfordern
+async function passwortVergessen() {
+  const email = document.getElementById("login-email").value.trim();
+  const meldung = document.getElementById("login-meldung");
+
+  if (!email) {
+    meldung.textContent = "Bitte zuerst deine E-Mail-Adresse eingeben.";
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+
+  if (error) {
+    meldung.textContent = "Fehler: " + error.message;
+  } else {
+    meldung.textContent =
+      "Falls die E-Mail-Adresse registriert ist, erhältst du einen Link zum Zurücksetzen des Passworts.";
+  }
+}
   </script>
 </body>
 </html>

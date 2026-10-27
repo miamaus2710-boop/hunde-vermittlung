@@ -565,9 +565,58 @@ header p {
 #passwort-auge:hover {
   opacity: 0.65;
 }
+/* Moderner Logout-Bereich */
+#logout-bereich:not([hidden]) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 20px;
+  background: #142c40;
+  border-bottom: 3px solid #8bd8ef;
+}
+
+#logout-benutzer {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#logout-button {
+  background: #8bd8ef;
+  color: #142c40;
+  border: none;
+  border-radius: 12px;
+  padding: 11px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#logout-button:hover {
+  background: #bceeff;
+}
+
+@media (max-width: 600px) {
+  #logout-bereich:not([hidden]) {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  #logout-button {
+    padding: 10px 14px;
+  }
+}
 </style>
 </head>
 <body>
+  <div id="logout-bereich" hidden>
+  <span id="logout-benutzer"></span>
+  <button type="button" id="logout-button">
+    🚪 Abmelden
+  </button>
+</div>
   <button onclick="document.getElementById('mitarbeiter-login').hidden = false">🔐 Mitarbeiter-Login</button>
   <div id="passwort-zuruecksetzen" hidden>
   <h3>🔐 Neues Passwort festlegen</h3>
@@ -1299,6 +1348,10 @@ if (rollenFehler || !mitarbeiter ||
   await supabaseClient.auth.signOut();
 } else {
   meldung.textContent = "Angemeldet als " + mitarbeiter.rolle;
+  document.getElementById("logout-bereich").hidden = false;
+document.getElementById("logout-benutzer").textContent =
+  "Angemeldet als " + mitarbeiter.rolle;
+document.getElementById("mitarbeiter-login").hidden = true;
   document.getElementById("verwaltung").hidden = false;
 }
   }
@@ -1311,6 +1364,29 @@ document.getElementById("formular-titel").textContent = "🐾 Neuen Hund eintrag
   formular.querySelectorAll("input:not([type=file]), textarea").forEach(feld => feld.value = "");
   document.getElementById("hund-sichtbar").checked = true;
   formular.hidden = false;
+};
+
+    // Mitarbeiter sicher abmelden
+document.getElementById("logout-button").onclick = async () => {
+  const button = document.getElementById("logout-button");
+  button.disabled = true;
+
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    alert("Abmelden fehlgeschlagen: " + error.message);
+    button.disabled = false;
+    return;
+  }
+
+  document.getElementById("verwaltung").hidden = true;
+  document.getElementById("logout-bereich").hidden = true;
+  document.getElementById("mitarbeiter-login").hidden = true;
+  document.getElementById("login-email").value = "";
+  document.getElementById("login-passwort").value = "";
+  document.getElementById("login-meldung").textContent = "";
+
+  button.disabled = false;
 };
     async function anmeldungWiederherstellen() {
   const { data: { user } } = await supabaseClient.auth.getUser();
@@ -1331,7 +1407,10 @@ document.getElementById("formular-titel").textContent = "🐾 Neuen Hund eintrag
   document.getElementById("verwaltung").hidden = false;
   document.getElementById("login-meldung").textContent =
     "Angemeldet als " + mitarbeiter.rolle;
-}
+      document.getElementById("logout-bereich").hidden = false;
+document.getElementById("logout-benutzer").textContent =
+  "Angemeldet als " + mitarbeiter.rolle;
+document.getElementById("mitarbeiter-login").hidden = true;
 document.getElementById("hund-speichern").onclick = async () => {
   console.log("SPEICHERN – Hunde-ID:", window.bearbeiteHundId);
   const meldung = document.getElementById("speicher-meldung");

@@ -608,6 +608,31 @@ header p {
     padding: 10px 14px;
   }
 }
+  /* Moderne Mitarbeiter-Login-Leiste */
+#login-leiste {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 20px;
+  background: #142c40;
+  border-bottom: 3px solid #8bd8ef;
+}
+
+#login-oeffnen {
+  background: #8bd8ef;
+  color: #142c40;
+  border: none;
+  border-radius: 12px;
+  padding: 11px 20px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#login-oeffnen:hover {
+  background: #bceeff;
+}
 </style>
 </head>
 <body>
@@ -617,7 +642,12 @@ header p {
     🚪 Abmelden
   </button>
 </div>
-  <button onclick="document.getElementById('mitarbeiter-login').hidden = false">🔐 Mitarbeiter-Login</button>
+  <div id="login-leiste">
+  <button type="button" id="login-oeffnen"
+    onclick="document.getElementById('mitarbeiter-login').hidden = false;">
+    🔐 Mitarbeiter-Login
+  </button>
+</div>
   <div id="passwort-zuruecksetzen" hidden>
   <h3>🔐 Neues Passwort festlegen</h3>
   <input type="password" id="neues-passwort"

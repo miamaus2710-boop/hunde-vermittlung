@@ -1566,7 +1566,9 @@ bestaetigung.style.cssText = "position:fixed;top:25px;left:50%;transform:transla
 document.body.append(bestaetigung);
 
 setTimeout(() => bestaetigung.remove(), 2000);
-  };
+};
+}  
+      
 anmeldungWiederherstellen();
 supabaseClient.auth.onAuthStateChange((event) => {
   if (event === "PASSWORD_RECOVERY") {

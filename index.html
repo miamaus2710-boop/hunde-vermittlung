@@ -615,7 +615,7 @@ header p {
 }
 #login-leiste {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
   padding: 12px 20px;
   background: #142c40;
@@ -637,6 +637,46 @@ header p {
 #login-oeffnen:hover {
   background: #bceeff;
 }
+/* Login-Felder innerhalb der blauen Leiste */
+#mitarbeiter-login:not([hidden]) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  margin-left: 15px;
+}
+
+#mitarbeiter-login #login-email {
+  width: 220px;
+  margin: 0;
+}
+
+#mitarbeiter-login .passwort-feld {
+  width: 220px;
+  margin: 0;
+}
+
+#mitarbeiter-login #login-button {
+  background: #8bd8ef;
+  color: #142c40;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#mitarbeiter-login #passwort-vergessen {
+  background: transparent;
+  color: #bceeff;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#mitarbeiter-login #login-meldung:empty {
+  display: none;
+}
 </style>
 </head>
 <body>
@@ -645,13 +685,7 @@ header p {
   <button type="button" id="logout-button">
     🚪 Abmelden
   </button>
-</div>
-  <div id="login-leiste">
-  <button type="button" id="login-oeffnen"
-    onclick="document.getElementById('mitarbeiter-login').hidden = false;">
-    🔐 Mitarbeiter-Login
-  </button>
-</div>
+  </div>
   <div id="passwort-zuruecksetzen" hidden>
   <h3>🔐 Neues Passwort festlegen</h3>
   <input type="password" id="neues-passwort"
@@ -659,8 +693,13 @@ header p {
   <button id="passwort-speichern">Passwort speichern</button>
   <p id="passwort-meldung"></p>
 </div>
-  <div id="mitarbeiter-login"hidden>
-  <h3>🐾 Mitarbeiter-Anmeldung</h3>
+  <div id="login-leiste">
+  <button type="button" id="login-oeffnen"
+    onclick="document.getElementById('mitarbeiter-login').hidden = false;">
+    🔐 Mitarbeiter-Login
+  </button>
+  
+  <div id="mitarbeiter-login" hidden>
   <input type="email" id="login-email" placeholder="E-Mail-Adresse">
   <div class="passwort-feld">
   <input type="password" id="login-passwort" placeholder="Passwort">
@@ -687,7 +726,8 @@ header p {
 </button>
   <p id="login-meldung"></p>
 </div>
-  <header>
+</div>
+<header>
   </header>
 
   <main>

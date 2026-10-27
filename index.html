@@ -535,6 +535,36 @@ header p {
   background: #344f70;
   color: white;
 }
+/* Passwortfeld mit Augensymbol */
+.passwort-feld {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  max-width: 350px;
+}
+
+.passwort-feld input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 48px;
+}
+
+#passwort-auge {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 6px;
+}
+
+#passwort-auge:hover {
+  opacity: 0.65;
+}
 </style>
 </head>
 <body>
@@ -549,7 +579,21 @@ header p {
   <div id="mitarbeiter-login"hidden>
   <h3>🐾 Mitarbeiter-Anmeldung</h3>
   <input type="email" id="login-email" placeholder="E-Mail-Adresse">
+  <div class="passwort-feld">
   <input type="password" id="login-passwort" placeholder="Passwort">
+  <button
+    type="button"
+    id="passwort-auge"
+    aria-label="Passwort anzeigen"
+    onclick="
+      const feld = document.getElementById('login-passwort');
+      const sichtbar = feld.type === 'password';
+      feld.type = sichtbar ? 'text' : 'password';
+      this.textContent = sichtbar ? '🙈' : '👁️';
+      this.setAttribute('aria-label', sichtbar ? 'Passwort verbergen' : 'Passwort anzeigen');
+    "
+  >👁️</button>
+</div>
   <button id="login-button">Anmelden</button>
   <p id="login-meldung"></p>
 </div>

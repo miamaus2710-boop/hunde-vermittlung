@@ -1379,6 +1379,7 @@ if (rollenFehler || !mitarbeiter ||
 } else {
   meldung.textContent = "Angemeldet als " + mitarbeiter.rolle;
   document.getElementById("logout-bereich").hidden = false;
+  document.getElementById("login-leiste").hidden = true;
 document.getElementById("logout-benutzer").textContent =
   "Angemeldet als " + mitarbeiter.rolle;
 document.getElementById("mitarbeiter-login").hidden = true;
@@ -1411,6 +1412,7 @@ document.getElementById("logout-button").onclick = async () => {
 
   document.getElementById("verwaltung").hidden = true;
   document.getElementById("logout-bereich").hidden = true;
+  document.getElementById("login-leiste").hidden = false;
   document.getElementById("mitarbeiter-login").hidden = true;
   document.getElementById("login-email").value = "";
   document.getElementById("login-passwort").value = "";
@@ -1438,6 +1440,7 @@ document.getElementById("logout-button").onclick = async () => {
   document.getElementById("login-meldung").textContent =
     "Angemeldet als " + mitarbeiter.rolle;
       document.getElementById("logout-bereich").hidden = false;
+      document.getElementById("login-leiste").hidden = true;
 document.getElementById("logout-benutzer").textContent =
   "Angemeldet als " + mitarbeiter.rolle;
 document.getElementById("mitarbeiter-login").hidden = true;

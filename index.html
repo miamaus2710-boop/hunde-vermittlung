@@ -101,7 +101,9 @@ ladeHunde();
   min-height: 100vh;
 }
  header {
-   position: relative;
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
     background-image: url("Titelbild.png");
     background-size: 100% auto;
     background-position: center top;
@@ -122,6 +124,40 @@ header p {
     display: none;
     color: white;
     text-align: center;
+}
+  #titel-navigation {
+  position: absolute;
+  top: 25px;
+  left: 5%;
+  width: 90%;
+  box-sizing: border-box;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 25px;
+  background: rgba(20, 44, 64, 0.65);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+#titel-navigation .nav-links {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+}
+
+#titel-navigation a {
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+#titel-navigation a:hover {
+  color: #8bd8ef;
 }
     main { max-width: 1100px; margin: auto; padding: 25px; }
     .filter {
@@ -617,9 +653,10 @@ header p {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 12px 20px;
-  background: #142c40;
-  border-bottom: 3px solid #8bd8ef;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: none;
 }
 
 #login-oeffnen {
@@ -789,7 +826,14 @@ header p {
 </div>
 </div>
 <header>
-  </header>
+  <nav id="titel-navigation">
+    <div class="nav-links">
+      <a href="#startseite">⌂ Startseite</a>
+      <a href="#schuetzlinge">Kontakt</a>
+    </div>
+    <div id="nav-login-platz"></div>
+  </nav>
+</header>
 
   <main>
     <h2>Unsere Schützlinge</h2>
@@ -1872,7 +1916,12 @@ document.body.append(bestaetigung);
 setTimeout(() => bestaetigung.remove(), 2000);
 };
       
-anmeldungWiederherstellen();
+const navLoginPlatz = document.getElementById("nav-login-platz");
+const loginLeiste = document.getElementById("login-leiste");
+const logoutBereich = document.getElementById("logout-bereich");
+
+navLoginPlatz.append(loginLeiste, logoutBereich);
+    anmeldungWiederherstellen();
 supabaseClient.auth.onAuthStateChange((event) => {
   if (event === "PASSWORD_RECOVERY") {
     document.getElementById("passwort-zuruecksetzen").hidden = false;

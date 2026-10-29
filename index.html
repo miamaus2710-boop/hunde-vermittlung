@@ -803,12 +803,15 @@ header p {
   cursor: pointer;
 }
 
-#charakter-bereich input[type="checkbox"] {
+#hunde-formular #charakter-bereich input[type="checkbox"] {
+  display: inline-block;
   width: 20px;
   height: 20px;
+  min-width: 20px;
+  padding: 0;
   margin: 0;
-  accent-color: #8bd0ef;
   flex-shrink: 0;
+  accent-color: #8bd0ef;
 }
 
 </style>
@@ -1864,7 +1867,8 @@ charakter: Array.from(
   document.querySelectorAll(
     'input[name="hund-charakter"]:checked'
   )
-).map(checkbox => checkbox.value),
+).map(checkbox => checkbox.getAttribute("value"))
+ .filter(Boolean),
 beschreibung: wert("hund-beschreibung")
   };
   const standortDaten = {

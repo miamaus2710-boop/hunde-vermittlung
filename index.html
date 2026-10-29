@@ -828,9 +828,10 @@ header p {
 <header>
   <nav id="titel-navigation">
     <div class="nav-links">
-      <a href="#startseite">⌂ Startseite</a>
-      <a href="#schuetzlinge">Kontakt</a>
-    </div>
+<a href="#" onclick="zurStartseite(); return false;">⌂ Startseite</a>
+<a href="#kontakt">Kontakt</a>
+<a href="#rechtliches">Rechtliches</a>
+</div>
     <div id="nav-login-platz"></div>
   </nav>
 </header>
@@ -1293,7 +1294,21 @@ inhalt.append(name, status, alter, geschlecht, groesse);
   });
 
 }
-function zeigeHund(hund) {
+function zurStartseite() {
+  const details = document.getElementById("hundedetails");
+  const liste = document.getElementById("hundeliste");
+  const filterButton = document.getElementById("filter-oeffnen");
+  const filter = document.getElementById("hundefilter");
+
+  details.hidden = true;
+  liste.style.display = "";
+  filterButton.style.display = "";
+  filter.style.display = "none";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+    function zeigeHund(hund) {
   const details = document.getElementById("hundedetails");
   const liste = document.getElementById("hundeliste");
 
@@ -1314,12 +1329,10 @@ zurueck.style.padding = "12px 20px";
 zurueck.style.fontSize = "16px";
 zurueck.style.cursor = "pointer";
 
-  zurueck.onclick = () => {
-    details.hidden = true;
-    liste.style.display = "";
-    document.getElementById("filter-oeffnen").style.display = "";
-    document.getElementById("hundefilter").style.display = "";
-  };
+ zurueck.onclick = () => {
+  zurStartseite();
+};
+
   details.append(zurueck);
 if (hund.fotos && hund.fotos.length > 0) {
   const galerie = document.createElement("div");

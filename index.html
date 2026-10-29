@@ -1048,16 +1048,39 @@ if (hundStatus === "Reserviert") {
 }
 
     const alter = document.createElement("p");
-alter.textContent = "Alter: " + (hund.alter ?? "Keine Angabe");
+
+if (hund.geburtsdatum) {
+  const geburt = new Date(hund.geburtsdatum);
+  const heute = new Date();
+
+  let jahre = heute.getFullYear() - geburt.getFullYear();
+
+  if (
+    heute.getMonth() < geburt.getMonth() ||
+    (heute.getMonth() === geburt.getMonth() &&
+     heute.getDate() < geburt.getDate())
+  ) {
+    jahre--;
+  }
+
+  alter.textContent = "Alter: ca. " + jahre + " Jahre";
+} else {
+  alter.textContent = "Alter: Nicht bekannt";
+}
 
 const geschlecht = document.createElement("p");
-geschlecht.textContent = "Geschlecht: " + (hund.geschlecht || "Keine Angabe");
+geschlecht.textContent =
+  "Geschlecht: " + (hund.geschlecht || "Nicht bekannt");
 
-const beschreibung = document.createElement("p");
-beschreibung.textContent = hund.beschreibung || "";
+const groesse = document.createElement("p");
+groesse.textContent =
+  "Schulterhöhe: " +
+  (hund.groesse != null && hund.groesse !== ""
+    ? "ca. " + hund.groesse + " cm"
+    : "Nicht bekannt");
 
+inhalt.append(name, status, alter, geschlecht, groesse);
 
-    inhalt.append(name, status, alter, geschlecht, beschreibung);
     karte.append(inhalt);
     liste.append(karte);
   });

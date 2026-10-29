@@ -1127,9 +1127,9 @@ galerie.style.maxWidth = "100%";
 
   let aktuellesBild = 0;
   const bildbereich = document.createElement("div");
-bildbereich.style.width = "700px";
+bildbereich.style.width = "auto";
 bildbereich.style.maxWidth = "100%";
-bildbereich.style.height = "500px";
+bildbereich.style.height = "auto";
 bildbereich.style.display = "flex";
 bildbereich.style.alignItems = "center";
 bildbereich.style.justifyContent = "center";
@@ -1142,14 +1142,14 @@ bildbereich.style.minWidth = "0";
   hauptbild.src = hund.fotos[aktuellesBild];
 }
   hauptbild.alt = "Foto von " + hund.name;
-  hauptbild.style.width = "100%";
+  hauptbild.style.width = "auto";
   hauptbild.style.maxHeight = "500px";
-  hauptbild.style.maxWidth = "700px";
-  hauptbild.style.height = "100%";
+  hauptbild.style.maxWidth = "100%";
+  hauptbild.style.height = "auto";
   hauptbild.style.objectFit = "contain";
-hauptbild.style.objectPosition = "left center";
+hauptbild.style.objectPosition = "center";
   hauptbild.style.borderRadius = "12px";
-  hauptbild.style.backgroundColor = "#f1f5f9";
+  hauptbild.style.backgroundColor = "transparent";
 
   const pfeilLinks = document.createElement("button");
 pfeilLinks.textContent = "❮";

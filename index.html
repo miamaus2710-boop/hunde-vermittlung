@@ -1494,6 +1494,7 @@ datenblatt.style.gridTemplateColumns = "repeat(auto-fit, minmax(180px, 1fr))";
 datenblatt.style.gap = "12px";
 datenblatt.style.margin = "20px 0";
 
+ console.log("CHARAKTER-TEST:", hund.name, hund.charakter);     
 const angaben = [
   ["Geburtsdatum", hund.geburtsdatum ? "ca. " + new Date(hund.geburtsdatum + "T00:00:00").toLocaleDateString("de-DE") : ""],
   ["Geschlecht", hund.geschlecht],

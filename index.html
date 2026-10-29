@@ -1505,9 +1505,21 @@ const angaben = [
   ["Gechipt", hund.gechipt],
   ["Kastriert", hund.kastriert],
  ["Status", hund.status],
-["Charakter", (hund.charakter || [])
-  .filter(eigenschaft => eigenschaft && eigenschaft.trim())
-  .join(", ") || "Nicht bekannt"]
+["Charakter", (() => {
+  let charakter = hund.charakter;
+
+  if (typeof charakter === "string") {
+    try {
+      charakter = JSON.parse(charakter);
+    } catch {
+      charakter = [charakter];
+    }
+  }
+
+  return Array.isArray(charakter)
+    ? charakter.filter(Boolean).join(", ") || "Nicht bekannt"
+    : "Nicht bekannt";
+})()]
 
 ];
 

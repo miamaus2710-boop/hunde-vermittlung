@@ -677,6 +677,67 @@ header p {
 #mitarbeiter-login #login-meldung:empty {
   display: none;
 }
+
+  /* Moderne Fotoverwaltung */
+#foto-verwaltung {
+  margin-top: 25px;
+  padding: 22px;
+  background: #243b55;
+  border: 1px solid #52799d;
+  border-radius: 18px;
+  color: white;
+}
+
+#foto-verwaltung h3 {
+  color: #aee9ff;
+  margin: 0 0 10px;
+}
+
+#foto-verwaltung p {
+  color: #d0e4f5;
+  font-size: 14px;
+}
+
+#foto-vorschau {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.foto-kachel {
+  position: relative;
+  padding: 8px;
+  background: #344f70;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.foto-kachel.titelbild {
+  border-color: #8bd0ef;
+}
+
+.foto-kachel img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 9px;
+}
+
+.foto-aktionen {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+#foto-verwaltung .foto-aktionen button {
+  padding: 7px;
+  font-size: 12px;
+  border-radius: 8px;
+}
 </style>
 </head>
 <body>
@@ -932,6 +993,11 @@ header p {
     placeholder="Beschreibe den Hund..."></textarea>
 <label for="hund-fotos">📷 Hundefotos auswählen</label>
 <input type="file" id="hund-fotos" accept="image/*" multiple>
+      <div id="foto-verwaltung">
+  <h3>📸 Bildergalerie verwalten</h3>
+  <p>Wähle dein Titelbild, verschiebe Fotos oder entferne einzelne Bilder.</p>
+  <div id="foto-vorschau"></div>
+</div>
   <button id="hund-speichern">
     💾 Hund speichern
   </button>
@@ -944,6 +1010,103 @@ header p {
 
   <script>
     let hundInBearbeitung = null;
+    let fotosInBearbeitung = [];
+let entfernteFotos = [];
+    document.getElementById("hund-fotos").addEventListener("change", function () {
+  const dateien = Array.from(this.files);
+
+  dateien.forEach(datei => {
+    if (!datei.type.startsWith("image/")) return;
+
+    fotosInBearbeitung.push({
+      datei: datei,
+      url: URL.createObjectURL(datei)
+    });
+  });
+
+  this.value = "";
+  zeigeFotoVorschau();
+});
+
+function zeigeFotoVorschau() {
+  const bereich = document.getElementById("foto-vorschau");
+  bereich.innerHTML = "";
+
+  fotosInBearbeitung.forEach((foto, index) => {
+    const kachel = document.createElement("div");
+    kachel.draggable = true;
+
+kachel.ondragstart = (event) => {
+  event.dataTransfer.setData("text/plain", String(index));
+  event.dataTransfer.effectAllowed = "move";
+};
+
+kachel.ondragover = (event) => {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+};
+
+kachel.ondrop = (event) => {
+  event.preventDefault();
+
+  const von = Number(event.dataTransfer.getData("text/plain"));
+  const nach = index;
+
+  if (!Number.isInteger(von) ||
+      von < 0 ||
+      von >= fotosInBearbeitung.length ||
+      von === nach) return;
+
+  const [foto] = fotosInBearbeitung.splice(von, 1);
+  fotosInBearbeitung.splice(nach, 0, foto);
+
+  zeigeFotoVorschau();
+};
+
+    kachel.className = "foto-kachel";
+
+    if (index === 0) {
+      kachel.classList.add("titelbild");
+    }
+
+    const bild = document.createElement("img");
+    bild.src = foto.url;
+    bild.alt = "Hundefoto " + (index + 1);
+const aktionen = document.createElement("div");
+aktionen.className = "foto-aktionen";
+
+const titelButton = document.createElement("button");
+titelButton.type = "button";
+titelButton.textContent =
+  index === 0 ? "⭐ Titelbild" : "☆ Als Titelbild";
+
+titelButton.onclick = () => {
+  const [ausgewaehltesFoto] = fotosInBearbeitung.splice(index, 1);
+  fotosInBearbeitung.unshift(ausgewaehltesFoto);
+  zeigeFotoVorschau();
+};
+const loeschButton = document.createElement("button");
+loeschButton.type = "button";
+loeschButton.textContent = "❌ Löschen";
+
+loeschButton.onclick = () => {
+  if (!confirm("Möchtest du dieses Foto entfernen?")) return;
+
+  const [foto] = fotosInBearbeitung.splice(index, 1);
+
+  if (foto.datei) {
+    URL.revokeObjectURL(foto.url);
+  } else {
+    entfernteFotos.push(foto.url);
+  }
+
+  zeigeFotoVorschau();
+};
+aktionen.append(titelButton,loeschbutton);
+    kachel.append(bild, aktionen);
+    bereich.append(kachel);
+  });
+}
     function filtern() {
   const suche = document.getElementById("suche").value.trim().toLowerCase();
   const status = document.getElementById("status").value;
@@ -1366,6 +1529,22 @@ wertSetzen("hund-raum-nummer", hund.raum_nummer);
   wertSetzen("hund-status", hund.status);
    document.getElementById("hund-sichtbar").checked = hund.sichtbar === true;   
   wertSetzen("hund-beschreibung", hund.beschreibung);
+      fotosInBearbeitung.forEach(foto => {
+  if (foto.datei) {
+    URL.revokeObjectURL(foto.url);
+  }
+});
+
+fotosInBearbeitung = (hund.fotos || []).map(url => ({
+  url: url,
+  datei: null
+}));
+
+entfernteFotos = [];
+
+document.getElementById("hund-fotos").value = "";
+
+zeigeFotoVorschau();
 
   document.getElementById("hunde-formular").hidden = false;
       document.getElementById("hunde-formular").style.display = "block";
@@ -1461,6 +1640,18 @@ window.bearbeiteHundId = null;
 document.getElementById("formular-titel").textContent = "🐾 Neuen Hund eintragen";
   formular.querySelectorAll("input:not([type=file]), textarea").forEach(feld => feld.value = "");
   document.getElementById("hund-sichtbar").checked = true;
+  fotosInBearbeitung.forEach(foto => {
+  if (foto.datei) {
+    URL.revokeObjectURL(foto.url);
+  }
+});
+
+fotosInBearbeitung = [];
+entfernteFotos = [];
+
+document.getElementById("hund-fotos").value = "";
+
+zeigeFotoVorschau();
   formular.hidden = false;
 };
 
@@ -1511,7 +1702,8 @@ document.getElementById("logout-button").onclick = async () => {
 document.getElementById("logout-benutzer").textContent =
   "Angemeldet als " + mitarbeiter.rolle;
 document.getElementById("mitarbeiter-login").hidden = true;
-document.getElementById("hund-speichern").onclick = async () => {
+}
+      document.getElementById("hund-speichern").onclick = async () => {
   console.log("SPEICHERN – Hunde-ID:", window.bearbeiteHundId);
   const meldung = document.getElementById("speicher-meldung");
 const ladeAnzeige = document.createElement("div");
@@ -1555,7 +1747,9 @@ beschreibung: wert("hund-beschreibung")
   unterbringungsart: wert("hund-unterbringungsart") || null,
   raum_nummer: wert("hund-raum-nummer") || null
 };
-  const dateien = document.getElementById("hund-fotos").files;
+  const dateien = fotosInBearbeitung
+  .filter(foto => foto.datei)
+  .map(foto => foto.datei);
 const fotoUrls = [];
 
 for (const datei of dateien) {
@@ -1568,9 +1762,12 @@ for (const datei of dateien) {
     });
 
   if (uploadFehler) {
-    meldung.textContent = "Foto-Upload fehlgeschlagen: " + uploadFehler.message;
-    return;
-  }
+  ladeAnzeige.remove();
+  meldung.style.display = "block";
+  meldung.textContent =
+    "Foto-Upload fehlgeschlagen: " + uploadFehler.message;
+  return;
+}
 
   const { data } = supabaseClient.storage
     .from("hundefotos")
@@ -1579,25 +1776,22 @@ for (const datei of dateien) {
   fotoUrls.push(data.publicUrl);
 }
 
-if (window.bearbeiteHundId) {
-  const { data: vorhandenerHund, error: ladeFehler } = await supabaseClient
-    .from("hunde")
-    .select("fotos")
-    .eq("id", window.bearbeiteHundId)
-    .single();
+let neueFotoNummer = 0;
 
-  if (ladeFehler) {
-    ladeAnzeige.remove();
-    meldung.textContent = "Fehler: " + ladeFehler.message;
-    meldung.style.display = "block";
-    return;
+hund.fotos = fotosInBearbeitung.map(foto => {
+  if (!foto.datei) {
+    return foto.url;
   }
 
-  hund.fotos = [...(vorhandenerHund.fotos || []), ...fotoUrls];
-} else {
-  hund.fotos = fotoUrls;
+  return fotoUrls[neueFotoNummer++];
+});
+if (hund.fotos.some(url => typeof url !== "string" || !url.trim())) {
+  ladeAnzeige.remove();
+  meldung.style.display = "block";
+  meldung.textContent =
+    "Fehler: Mindestens ein Foto konnte nicht richtig verarbeitet werden.";
+  return;
 }
-
 const { data: gespeicherteHunde, error } =
   window.bearbeiteHundId
     ? await supabaseClient
@@ -1655,7 +1849,17 @@ ladeAnzeige.remove();
   }
 }
   window.bearbeiteHundId = null;
+fotosInBearbeitung.forEach(foto => {
+  if (foto.datei) {
+    URL.revokeObjectURL(foto.url);
+  }
+});
 
+fotosInBearbeitung = [];
+entfernteFotos = [];
+
+document.getElementById("hund-fotos").value = "";
+zeigeFotoVorschau();
 document.getElementById("hunde-formular").hidden = true;
   meldung.style.display = "none";
 meldung.innerHTML = "";
@@ -1667,7 +1871,6 @@ document.body.append(bestaetigung);
 
 setTimeout(() => bestaetigung.remove(), 2000);
 };
-}  
       
 anmeldungWiederherstellen();
 supabaseClient.auth.onAuthStateChange((event) => {

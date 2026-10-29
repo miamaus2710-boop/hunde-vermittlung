@@ -775,6 +775,42 @@ header p {
   font-size: 12px;
   border-radius: 8px;
 }
+  /* Charakterauswahl */
+#charakter-bereich {
+  margin: 24px 0;
+  padding: 22px;
+  background: #243b55;
+  border: 1px solid #52799d;
+  border-radius: 18px;
+}
+
+#charakter-bereich h3 {
+  color: #aee9ff;
+  margin: 0 0 10px;
+}
+
+#charakter-bereich p {
+  color: #d0e4f5;
+  font-size: 14px;
+}
+
+#charakter-bereich label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  margin: 5px 0;
+  cursor: pointer;
+}
+
+#charakter-bereich input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: #8bd0ef;
+  flex-shrink: 0;
+}
+
 </style>
 </head>
 <body>
@@ -1033,6 +1069,18 @@ header p {
     Deaktiviert: Nur berechtigte Mitarbeiter können ihn sehen.
   </small>
 </div>
+      <div id="charakter-bereich">
+  <h3>🐾 Charakter des Hundes</h3>
+  <p>Mehrere Eigenschaften auswählbar</p>
+
+  <label><input type="checkbox" name="hund-charakter" value="freundlich"> Freundlich</label>
+  <label><input type="checkbox" name="hund-charakter" value="ängstlich"> Ängstlich</label>
+  <label><input type="checkbox" name="hund-charakter" value="sozial"> Sozial</label>
+  <label><input type="checkbox" name="hund-charakter" value="menschenbezogen"> Menschenbezogen</label>
+  <label><input type="checkbox" name="hund-charakter" value="etwas zurückhaltend"> Etwas zurückhaltend</label>
+  <label><input type="checkbox" name="hund-charakter" value="aufgeschlossen"> Aufgeschlossen</label>
+</div>
+
   <label>Beschreibung</label>
   <textarea id="hund-beschreibung"
     placeholder="Beschreibe den Hund..."></textarea>
@@ -1452,7 +1500,11 @@ const angaben = [
   ["Geimpft", hund.geimpft],
   ["Gechipt", hund.gechipt],
   ["Kastriert", hund.kastriert],
-  ["Status", hund.status]
+ ["Status", hund.status],
+["Charakter", Array.isArray(hund.charakter) && hund.charakter.length
+  ? hund.charakter.join(", ")
+  : "Nicht bekannt"]
+
 ];
 
 angaben.forEach(([bezeichnung, wert]) => {
@@ -1586,6 +1638,11 @@ wertSetzen("hund-raum-nummer", hund.raum_nummer);
   wertSetzen("hund-status", hund.status);
    document.getElementById("hund-sichtbar").checked = hund.sichtbar === true;   
   wertSetzen("hund-beschreibung", hund.beschreibung);
+      document.querySelectorAll(
+  'input[name="hund-charakter"]'
+).forEach(checkbox => {
+  checkbox.checked = (hund.charakter || []).includes(checkbox.value);
+});
       fotosInBearbeitung.forEach(foto => {
   if (foto.datei) {
     URL.revokeObjectURL(foto.url);
@@ -1697,6 +1754,12 @@ window.bearbeiteHundId = null;
 document.getElementById("formular-titel").textContent = "🐾 Neuen Hund eintragen";
   formular.querySelectorAll("input:not([type=file]), textarea").forEach(feld => feld.value = "");
   document.getElementById("hund-sichtbar").checked = true;
+  document.querySelectorAll(
+  'input[name="hund-charakter"]'
+).forEach(checkbox => {
+  checkbox.checked = false;
+});
+
   fotosInBearbeitung.forEach(foto => {
   if (foto.datei) {
     URL.revokeObjectURL(foto.url);
@@ -1795,8 +1858,13 @@ const ladeStart = Date.now();
     geimpft: wert("hund-geimpft"),
     gechipt: wert("hund-gechipt"),
     kastriert: wert("hund-kastriert"),
-    status: wert("hund-status"),
+status: wert("hund-status"),
 sichtbar: document.getElementById("hund-sichtbar").checked,
+charakter: Array.from(
+  document.querySelectorAll(
+    'input[name="hund-charakter"]:checked'
+  )
+).map(checkbox => checkbox.value),
 beschreibung: wert("hund-beschreibung")
   };
   const standortDaten = {

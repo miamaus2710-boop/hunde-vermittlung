@@ -1224,11 +1224,11 @@ datenblatt.style.gap = "12px";
 datenblatt.style.margin = "20px 0";
 
 const angaben = [
-  ["Geburtsdatum", hund.geburtsdatum],
+  ["Geburtsdatum", hund.geburtsdatum ? "ca. " + new Date(hund.geburtsdatum + "T00:00:00").toLocaleDateString("de-DE") : ""],
   ["Geschlecht", hund.geschlecht],
   ["Aufenthaltsort", hund.aufenthaltsort],
-  ["Größe", hund.groesse ? hund.groesse + " cm" : ""],
-  ["Gewicht", hund.gewicht ? hund.gewicht + " kg" : ""],
+  ["Schulterhöhe", hund.groesse != null ? "ca. " + hund.groesse + " cm" : ""],
+  ["Gewicht", hund.gewicht != null ? "ca. " + hund.gewicht + " kg" : ""],
   ["Geimpft", hund.geimpft],
   ["Gechipt", hund.gechipt],
   ["Kastriert", hund.kastriert],

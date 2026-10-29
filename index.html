@@ -1354,7 +1354,8 @@ function zurStartseite() {
   details.hidden = true;
   liste.style.display = "";
   filterButton.style.display = "";
-  filter.style.display = "none";
+ filter.hidden = true;
+filter.style.removeProperty("display");
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }

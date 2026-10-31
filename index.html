@@ -3098,6 +3098,7 @@ document.getElementById("hunde-anfrage-formular")
       erfolgreich = true;
       nachrichtFeld.value = "";
       button.textContent = "✓ Anfrage gesendet";
+      document.getElementById("hunde-anfrage-dialog").close();
       status.textContent =
         "Vielen Dank! Deine Anfrage wurde versendet. " +
       "Wir melden uns per E-Mail bei dir. Bitte prüfe auch deinen Spam-Ordner.";

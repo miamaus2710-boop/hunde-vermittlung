@@ -1427,6 +1427,15 @@ header p {
 >
   🐾 Hunde werden gezählt …
 </p>
+    <label for="hundesortierung">Sortieren:</label>
+<select
+  id="hundesortierung"
+  onchange="aktualisiereHundekarten()"
+  style="padding:10px; margin:8px; border-radius:8px;"
+>
+  <option value="neueste">Neueste zuerst</option>
+  <option value="az">Name A–Z</option>
+</select>
     <button
   type="button"
   id="filter-oeffnen"
@@ -2121,9 +2130,24 @@ aktionen.append(titelButton,loeschButton);
 }
 
     async function aktualisiereHundekarten() {
-  const { data, error } = await supabaseClient
-    .from("hunde")
-    .select("*");
+    const sortierung =
+    document.getElementById("hundesortierung")?.value || "neueste";
+
+  let abfrage = supabaseClient.from("hunde").select("*");
+
+  if (sortierung === "az") {
+    abfrage = abfrage.order("name", {
+      ascending: true,
+      nullsFirst: false
+    });
+  } else {
+    abfrage = abfrage.order("created_at", {
+      ascending: false,
+      nullsFirst: false
+    });
+  }
+
+  const { data, error } = await abfrage;
 
   if (error) {
     console.error("Fehler beim Laden:", error);

@@ -869,7 +869,10 @@ header p {
     <div class="nav-links">
 <a href="#" onclick="zurStartseite(); return false;">⌂ Startseite</a>
 <a href="#kontakt">Kontakt</a>
-<a href="#rechtliches">Rechtliches</a>
+<a href="#rechtliches"
+   onclick="document.getElementById('rechtliches').showModal(); return false;">
+  Rechtliches
+</a>
 </div>
     <div id="nav-login-platz"></div>
   </nav>
@@ -973,21 +976,41 @@ header p {
 
  <div class="hunde" id="hundeliste"></div>
     <div id="hundedetails" hidden></div>
-  <section
+<dialog
   id="rechtliches"
   aria-labelledby="rechtliches-titel"
   style="
+    box-sizing:border-box;
+    width:calc(100% - 32px);
     max-width:960px;
-    margin:48px auto;
+    max-height:85vh;
+    margin:auto;
     padding:24px;
+    border:0;
     border-radius:18px;
     background:#edf6fc;
     color:#17324d;
     line-height:1.7;
+    overflow-y:auto;
     overflow-wrap:anywhere;
-    scroll-margin-top:24px;
+    box-shadow:0 15px 60px rgba(0,0,0,0.3);
   "
 >
+  <form method="dialog" style="position:sticky; top:0; text-align:right;">
+    <button
+      aria-label="Rechtliches schließen"
+      style="
+        padding:8px 14px;
+        border:0;
+        border-radius:10px;
+        background:#bde0fe;
+        color:#17324d;
+        font-size:20px;
+        cursor:pointer;
+      "
+    >✕</button>
+  </form>
+
   <h2 id="rechtliches-titel">Rechtliches</h2>
 
   <p>
@@ -1268,7 +1291,7 @@ header p {
     Ein allgemeiner Ausschluss jeder Verantwortung für
     verlinkte Inhalte wird hiermit nicht erklärt.
   </p>
-</section>
+  </dialog>
   </main>
   <section id="verwaltung" hidden>
   <h2>🐾 Hunde-Verwaltung</h2>

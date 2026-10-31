@@ -2219,7 +2219,38 @@ inhalt.append(name, status, alter, geschlecht, groesse);
   });
 
 }
-function zurStartseite() {
+const navigationHunde = new Map();
+let navigationWiederherstellung = false;
+
+history.replaceState({
+  ...(history.state || {}),
+  hundeAnsicht: "liste",
+  hundeId: null
+}, "");
+
+window.addEventListener("popstate", function(event) {
+  navigationWiederherstellung = true;
+
+  try {
+    const hund = navigationHunde.get(event.state?.hundeId);
+
+    if (event.state?.hundeAnsicht === "details" && hund) {
+      zeigeHund(hund);
+    } else {
+      zurStartseite(true);
+    }
+  } finally {
+    navigationWiederherstellung = false;
+  }
+});
+
+function zurStartseite(ausVerlauf = false) {
+  if (!ausVerlauf &&
+      history.state?.hundeAnsicht === "details") {
+    history.back();
+    return;
+  }
+
   const details = document.getElementById("hundedetails");
   const liste = document.getElementById("hundeliste");
   const filterButton = document.getElementById("filter-oeffnen");
@@ -2228,13 +2259,29 @@ function zurStartseite() {
   details.hidden = true;
   liste.style.display = "";
   filterButton.style.display = "";
- filter.hidden = true;
-filter.style.removeProperty("display");
+  filter.hidden = true;
+  filter.style.removeProperty("display");
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-    function zeigeHund(hund) {
+function zeigeHund(hund) {
+  const hundSchluessel = String(hund.id);
+  navigationHunde.set(hundSchluessel, hund);
+
+  if (!navigationWiederherstellung) {
+    const zustand = {
+      ...(history.state || {}),
+      hundeAnsicht: "details",
+      hundeId: hundSchluessel
+    };
+
+    if (history.state?.hundeAnsicht === "details") {
+      history.replaceState(zustand, "");
+    } else {
+      history.pushState(zustand, "");
+    }
+  }
   const details = document.getElementById("hundedetails");
   const liste = document.getElementById("hundeliste");
 

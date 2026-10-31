@@ -1078,6 +1078,13 @@ header p {
 
   <main>
     <h2>Unsere Schützlinge</h2>
+    <p
+  id="hunde-counter"
+  role="status"
+  style="color:#17324d; font-size:18px; font-weight:800;"
+>
+  🐾 Hunde werden gezählt …
+</p>
     <button
   type="button"
   id="filter-oeffnen"
@@ -1781,7 +1788,15 @@ aktionen.append(titelButton,loeschButton);
     return;
   }
 
-  const liste = document.getElementById("hundeliste");
+  const counter = document.getElementById("hunde-counter");
+
+if (counter) {
+  const anzahl = data.length;
+
+  counter.textContent =
+    `🐾 Aktuell ${anzahl} ${anzahl === 1 ? "Hund" : "Hunde"}`;
+}
+  const liste = document.getElementById("hundeliste";
   liste.innerHTML = "";
 
   data.forEach(hund => {

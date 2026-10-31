@@ -2588,5 +2588,33 @@ async function passwortVergessen() {
   }
 }
   </script>
+<script>
+(() => {
+  const auswahl = document.querySelector(".social-whatsapp-auswahl");
+  if (!auswahl) return;
+
+  // Bei Klick außerhalb schließen
+  document.addEventListener("click", (event) => {
+    if (!auswahl.contains(event.target)) {
+      auswahl.open = false;
+    }
+  });
+
+  // Nach Auswahl eines Kanals schließen
+  auswahl.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      auswahl.open = false;
+    });
+  });
+
+  // Mit Escape schließen
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && auswahl.open) {
+      auswahl.open = false;
+      auswahl.querySelector("summary").focus();
+    }
+  });
+})();
+</script>
 </body>
 </html>

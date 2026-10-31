@@ -1015,6 +1015,115 @@ header p {
     border-radius: 8px;
   }
 }
+/* Mobiler Kopfbereich */
+@media (max-width: 767px) {
+  header {
+    aspect-ratio: auto;
+    height: auto;
+    padding-top: 33.333%;
+    background-size: 100% auto;
+    background-position: center top;
+    background-color: transparent;
+  }
+
+  #titel-navigation {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #17324d;
+    box-shadow: none;
+  }
+
+  #titel-navigation .nav-links {
+    width: 100%;
+    justify-content: space-around;
+    gap: 6px;
+  }
+
+  #titel-navigation .nav-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  #nav-login-platz {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #nav-login-platz:empty {
+    display: none;
+  }
+
+  #login-leiste {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  #mitarbeiter-login:not([hidden]) {
+    width: 100%;
+    margin-left: 0;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  #mitarbeiter-login #login-email,
+  #mitarbeiter-login .passwort-feld {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  #logout-bereich:not([hidden]) {
+    justify-content: center;
+  }
+
+  #logout-benutzer {
+    overflow-wrap: anywhere;
+  }
+
+  .titel-social {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    padding: 12px;
+    background: #17324d;
+  }
+
+  .social-ueberschrift {
+    margin-bottom: 8px;
+    font-size: 13px;
+    text-align: center;
+    text-shadow: none;
+  }
+
+  .social-buttons {
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .social-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .whatsapp-kanalliste {
+    left: auto;
+    right: 0;
+    width: 270px;
+    max-width: 85vw;
+  }
+}
 </style>
 </head>
 <body>

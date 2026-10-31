@@ -1124,6 +1124,44 @@ header p {
     max-width: 85vw;
   }
 }
+/* Mobilen Kopfbereich kompakter machen */
+@media (max-width: 767px) {
+  #titel-navigation {
+    padding: 4px 12px;
+    gap: 4px;
+  }
+
+  #login-oeffnen {
+    min-height: 44px;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .titel-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 8px 12px 12px;
+  }
+
+  .social-ueberschrift {
+    margin: 0;
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .social-buttons {
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .social-button {
+    width: 44px;
+    height: 44px;
+  }
+}
 </style>
 </head>
 <body>

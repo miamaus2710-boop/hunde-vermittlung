@@ -3000,46 +3000,117 @@ async function passwortVergessen() {
       in unserer Datenschutzerklärung.
     </p>
 
-    <button type="submit" id="anfrage-senden" disabled>
+    <button type="submit" id="anfrage-senden">
       Anfrage senden
     </button>
 
-    <p id="anfrage-versandstatus" role="status">
-      Der E-Mail-Versand wird gerade eingerichtet.
-      Über dieses Formular können noch keine Anfragen
-      gesendet werden.
-    </p>
+    <p id="anfrage-versandstatus" role="status"></p>
   </form>
 </dialog>
 
 <script>
+let hundeAnfrageLaeuft = false;
+
 function oeffneHundeAnfrage(hund) {
+  if (hundeAnfrageLaeuft) return;
+
   const dialog = document.getElementById("hunde-anfrage-dialog");
   const formular = document.getElementById("hunde-anfrage-formular");
+  const button = document.getElementById("anfrage-senden");
+  const status = document.getElementById("anfrage-versandstatus");
   const name = hund.name || "Unbekannter Hund";
 
   formular.reset();
 
-  document.getElementById("anfrage-hund-id").value =
-    hund.id ?? "";
-
+  document.getElementById("anfrage-hund-id").value = hund.id ?? "";
   document.getElementById("anfrage-hund-name").value = name;
-
   document.getElementById("hunde-anfrage-titel").textContent =
     "Fragen zu " + name + "?";
 
-  if (!dialog.open) {
-    dialog.showModal();
-  }
+  button.disabled = false;
+  button.textContent = "Anfrage senden";
+  status.textContent = "";
+
+  if (!dialog.open) dialog.showModal();
 }
 
 document.getElementById("hunde-anfrage-formular")
-  .addEventListener("submit", function(event) {
+  .addEventListener("submit", async function(event) {
     event.preventDefault();
 
-    document.getElementById("anfrage-versandstatus").textContent =
-      "Der Versand ist noch nicht eingerichtet. " +
-      "Deine Nachricht wurde nicht gesendet.";
+    if (hundeAnfrageLaeuft || !this.reportValidity()) return;
+
+    const button = document.getElementById("anfrage-senden");
+    const status = document.getElementById("anfrage-versandstatus");
+    const emailFeld = document.getElementById("anfrage-email");
+    const nachrichtFeld = document.getElementById("anfrage-nachricht");
+
+    const anfrage = {
+      hund_id: document.getElementById("anfrage-hund-id").value,
+      email: emailFeld.value.trim(),
+      nachricht: nachrichtFeld.value.trim()
+    };
+
+    if (anfrage.nachricht.length < 5) {
+      status.textContent =
+        "Bitte schreibe eine Nachricht mit mindestens 5 Zeichen.";
+      return;
+    }
+
+    hundeAnfrageLaeuft = true;
+    button.disabled = true;
+    button.textContent = "Wird gesendet …";
+    emailFeld.disabled = true;
+    nachrichtFeld.disabled = true;
+    status.textContent = "Deine Anfrage wird übermittelt …";
+
+    let erfolgreich = false;
+
+    try {
+      const { data, error } =
+        await supabaseClient.functions.invoke("hundeanfrage", {
+          body: anfrage
+        });
+
+      if (error) {
+        let meldung =
+          "Der Versand konnte nicht bestätigt werden. Bitte später erneut versuchen.";
+
+        if (error.context &&
+            typeof error.context.json === "function") {
+          try {
+            const details = await error.context.json();
+            if (typeof details.error === "string") {
+              meldung = details.error;
+            }
+          } catch {}
+        }
+
+        throw new Error(meldung);
+      }
+
+      if (data?.success !== true) {
+        throw new Error(
+          data?.error || "Die Anfrage konnte nicht versendet werden."
+        );
+      }
+
+      erfolgreich = true;
+      nachrichtFeld.value = "";
+      button.textContent = "✓ Anfrage gesendet";
+      status.textContent =
+        "Vielen Dank! Deine Anfrage wurde versendet. " +
+        "Wir melden uns per E-Mail bei dir.";
+    } catch (fehler) {
+      status.textContent = fehler.message ||
+        "Der Versand konnte nicht bestätigt werden.";
+      button.textContent = "Erneut versuchen";
+    } finally {
+      hundeAnfrageLaeuft = false;
+      emailFeld.disabled = false;
+      nachrichtFeld.disabled = false;
+      button.disabled = erfolgreich;
+    }
   });
 </script>
 </body>

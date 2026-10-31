@@ -1163,6 +1163,126 @@ header p {
   }
 }
 
+.hund-fragen-button {
+  display: block;
+  margin-top: 12px;
+  padding: 14px 22px;
+  border: 1px solid #83b8cd;
+  border-radius: 12px;
+  background: #edf6fc;
+  color: #17324d;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.hund-fragen-button:hover {
+  background: #d9effa;
+}
+
+#hunde-anfrage-dialog {
+  box-sizing: border-box;
+  width: calc(100% - 24px);
+  max-width: 540px;
+  max-height: 90vh;
+  max-height: 90dvh;
+  margin: auto;
+  padding: 24px;
+  overflow-y: auto;
+  border: 0;
+  border-radius: 18px;
+  background: #edf6fc;
+  color: #17324d;
+  box-shadow: 0 15px 60px #0005;
+}
+
+#hunde-anfrage-dialog::backdrop {
+  background: #0008;
+}
+
+#hunde-anfrage-dialog .anfrage-kopf {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+#hunde-anfrage-dialog .anfrage-kopf button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: #bde0fe;
+  color: #17324d;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+#hunde-anfrage-titel {
+  margin: 8px 0 20px;
+  overflow-wrap: anywhere;
+}
+
+#hunde-anfrage-formular label {
+  display: block;
+  margin: 14px 0 6px;
+  font-weight: 800;
+}
+
+#hunde-anfrage-formular input,
+#hunde-anfrage-formular textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #a9c5d5;
+  border-radius: 10px;
+  background: #fff;
+  color: #17324d;
+  font: inherit;
+  font-size: 16px;
+}
+
+#hunde-anfrage-formular textarea {
+  resize: vertical;
+}
+
+#hunde-anfrage-formular input[readonly] {
+  background: #e2edf4;
+}
+
+#hunde-anfrage-dialog .anfrage-hinweis,
+#anfrage-versandstatus {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#anfrage-senden {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: #8bd0ef;
+  color: #17324d;
+  font: inherit;
+  font-weight: 800;
+}
+
+#anfrage-senden:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 767px) {
+  #hunde-anfrage-dialog {
+    padding: 16px;
+  }
+
+  .hund-fragen-button {
+    width: 100%;
+  }
+}
 </style>
 </head>
 <body>
@@ -2370,7 +2490,18 @@ anfrage.style.marginTop = "20px";
 }
 
 details.append(anfrage);
-  supabaseClient.auth.getUser().then(({ data }) => {
+  const fragenButton = document.createElement("button");
+fragenButton.type = "button";
+fragenButton.className = "hund-fragen-button";
+fragenButton.textContent =
+  "✉️ Fragen zu " + (hund.name || "diesem Hund") + "?";
+
+fragenButton.onclick = () => {
+  oeffneHundeAnfrage(hund);
+};
+
+details.append(fragenButton);
+      supabaseClient.auth.getUser().then(({ data }) => {
   if (!data.user) return;
 
   const bearbeiten = document.createElement("button");
@@ -2825,5 +2956,91 @@ async function passwortVergessen() {
   }
 }
   </script>
+<dialog id="hunde-anfrage-dialog"
+        aria-labelledby="hunde-anfrage-titel">
+  <form method="dialog" class="anfrage-kopf">
+    <button type="submit" aria-label="Anfragefenster schließen">
+      ✕
+    </button>
+  </form>
+
+  <h2 id="hunde-anfrage-titel">Fragen zum Hund</h2>
+
+  <form id="hunde-anfrage-formular">
+    <input type="hidden" id="anfrage-hund-id" name="hund_id">
+
+    <label for="anfrage-hund-name">Zu diesem Hund</label>
+    <input id="anfrage-hund-name" name="hund_name" readonly>
+
+    <label for="anfrage-email">Deine E-Mail-Adresse</label>
+    <input
+      type="email"
+      id="anfrage-email"
+      name="email"
+      autocomplete="email"
+      placeholder="name@beispiel.de"
+      maxlength="254"
+      required
+    >
+
+    <label for="anfrage-nachricht">Deine Nachricht</label>
+    <textarea
+      id="anfrage-nachricht"
+      name="nachricht"
+      rows="6"
+      maxlength="5000"
+      placeholder="Was möchtest du über diesen Hund wissen?"
+      required
+    ></textarea>
+
+    <p class="anfrage-hinweis">
+      Wir verwenden deine E-Mail-Adresse und Nachricht,
+      um deine Anfrage zu beantworten.
+      Weitere Informationen findest du unter „Rechtliches“
+      in unserer Datenschutzerklärung.
+    </p>
+
+    <button type="submit" id="anfrage-senden" disabled>
+      Anfrage senden
+    </button>
+
+    <p id="anfrage-versandstatus" role="status">
+      Der E-Mail-Versand wird gerade eingerichtet.
+      Über dieses Formular können noch keine Anfragen
+      gesendet werden.
+    </p>
+  </form>
+</dialog>
+
+<script>
+function oeffneHundeAnfrage(hund) {
+  const dialog = document.getElementById("hunde-anfrage-dialog");
+  const formular = document.getElementById("hunde-anfrage-formular");
+  const name = hund.name || "Unbekannter Hund";
+
+  formular.reset();
+
+  document.getElementById("anfrage-hund-id").value =
+    hund.id ?? "";
+
+  document.getElementById("anfrage-hund-name").value = name;
+
+  document.getElementById("hunde-anfrage-titel").textContent =
+    "Fragen zu " + name + "?";
+
+  if (!dialog.open) {
+    dialog.showModal();
+  }
+}
+
+document.getElementById("hunde-anfrage-formular")
+  .addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    document.getElementById("anfrage-versandstatus").textContent =
+      "Der Versand ist noch nicht eingerichtet. " +
+      "Deine Nachricht wurde nicht gesendet.";
+  });
+</script>
 </body>
 </html>

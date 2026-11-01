@@ -2282,11 +2282,23 @@ function aktualisiereFavoritenButton() {
 
   button.classList.toggle("aktiv", favoritenAnsicht);
 }
+function aktualisiereFavoritenSichtbarkeit() {
+  const favoriten = new Set(holeFavoriten().map(String));
 
+  document.querySelectorAll(".hund").forEach(karte => {
+    const herz = karte.querySelector(".favorit-herz");
+    if (!herz) return;
+
+    karte.style.display =
+      favoritenAnsicht && !favoriten.has(String(herz.dataset.hundId))
+        ? "none"
+        : "";
+  });
+}
 function toggleFavoritenansicht() {
   favoritenAnsicht = !favoritenAnsicht;
   aktualisiereFavoritenButton();
-  aktualisiereHundekarten();
+  aktualisiereFavoritenSichtbarkeit();
 }
 async function aktualisiereHundFavorit(hund, favorisiert) {
   const favoriten = new Set(holeFavoriten());
@@ -2297,6 +2309,7 @@ async function aktualisiereHundFavorit(hund, favorisiert) {
 
   speichereFavoriten(Array.from(favoriten));
   aktualisiereFavoritenButton();
+  aktualisiereFavoritenSichtbarkeit();
 
   document.querySelectorAll(".favorit-herz").forEach(button => {
     if (button.dataset.hundId !== id) return;
@@ -2346,9 +2359,28 @@ document.body.appendChild(ladeOverlay);
 
 try {
   await Promise.all([
-    aktualisiereHundekarten(),
-    new Promise(resolve => setTimeout(resolve, 1200))
-  ]);
+  (async () => {
+    const { data: neueZaehler, error: zaehlerFehler } =
+      await supabaseClient.rpc("oeffentliche_hunde_zaehler");
+
+    if (zaehlerFehler) {
+      console.warn("Herzzähler konnte nicht aktualisiert werden:", zaehlerFehler);
+      return;
+    }
+
+    const hundZaehler = (neueZaehler || []).find(
+      eintrag => String(eintrag.hund_id) === id
+    );
+    const anzahl = Number(hundZaehler?.favoriten_markierungen || 0);
+
+    document.querySelectorAll(".herz-zaehler").forEach(anzeige => {
+      if (anzeige.dataset.hundId === id) {
+        anzeige.textContent = `❤️ ${anzahl}`;
+      }
+    });
+  })(),
+  new Promise(resolve => setTimeout(resolve, 1200))
+]);
 } finally {
   ladeOverlay.remove();
 }
@@ -2671,6 +2703,8 @@ zaehlerZeile.style.cssText =
   "display:flex;align-items:center;gap:10px;font-size:13px;opacity:.65;margin:2px 0 8px;";
 
 const herzAnzeige = document.createElement("span");
+        herzAnzeige.className = "herz-zaehler";
+herzAnzeige.dataset.hundId = String(hund.id);
 herzAnzeige.textContent =
   `❤️ ${Number(zaehler.favoriten_markierungen || 0)}`;
 zaehlerZeile.append(herzAnzeige);

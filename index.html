@@ -2206,20 +2206,30 @@ if (hundStatus === "Reserviert") {
     const alter = document.createElement("p");
 
 if (hund.geburtsdatum) {
-  const geburt = new Date(hund.geburtsdatum);
+  const geburt = new Date(hund.geburtsdatum + "T00:00:00");
   const heute = new Date();
 
-  let jahre = heute.getFullYear() - geburt.getFullYear();
+  if (Number.isNaN(geburt.getTime()) || geburt > heute) {
+    alter.textContent = "Alter: Nicht bekannt";
+  } else {
+    let monate =
+      (heute.getFullYear() - geburt.getFullYear()) * 12 +
+      heute.getMonth() - geburt.getMonth();
 
-  if (
-    heute.getMonth() < geburt.getMonth() ||
-    (heute.getMonth() === geburt.getMonth() &&
-     heute.getDate() < geburt.getDate())
-  ) {
-    jahre--;
+    if (heute.getDate() < geburt.getDate()) monate--;
+    monate = Math.max(0, monate);
+
+    const jahre = Math.floor(monate / 12);
+    const restMonate = monate % 12;
+
+    if (jahre === 0) {
+      alter.textContent = `Alter: ca. ${monate} ${monate === 1 ? "Monat" : "Monate"}`;
+    } else if (restMonate === 0) {
+      alter.textContent = `Alter: ca. ${jahre} ${jahre === 1 ? "Jahr" : "Jahre"}`;
+    } else {
+      alter.textContent = `Alter: ca. ${jahre} ${jahre === 1 ? "Jahr" : "Jahre"} und ${restMonate} ${restMonate === 1 ? "Monat" : "Monate"}`;
+    }
   }
-
-  alter.textContent = "Alter: ca. " + jahre + " Jahre";
 } else {
   alter.textContent = "Alter: Nicht bekannt";
 }

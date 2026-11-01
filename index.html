@@ -633,7 +633,30 @@ header p {
 #logout-button:hover {
   background: #bceeff;
 }
+#hund-hinzufuegen {
+  background: linear-gradient(135deg, #8bd8ef, #70c8f5);
+  color: #142c40;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 11px 16px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(20, 44, 64, 0.18);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
 
+#hund-hinzufuegen:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(20, 44, 64, 0.24);
+}
+
+@media (max-width: 600px) {
+  #hund-hinzufuegen {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
 @media (max-width: 600px) {
   #logout-bereich:not([hidden]) {
     padding: 10px;
@@ -1288,6 +1311,9 @@ header p {
 <body>
   <div id="logout-bereich" hidden>
   <span id="logout-benutzer"></span>
+    <button type="button" id="hund-hinzufuegen">
+  ➕ Neuen Hund hinzufügen
+</button>
   <button type="button" id="logout-button">
     🚪 Abmelden
   </button>
@@ -1851,7 +1877,6 @@ header p {
   <section id="verwaltung" hidden>
   <h2>🐾 Hunde-Verwaltung</h2>
   <p>Hier können berechtigte Mitarbeiter später Hunde verwalten.</p>
-  <button id="hund-hinzufuegen">➕ Neuen Hund hinzufügen</button>
   <div id="verwaltungs-inhalt"></div>
     <div id="hunde-formular" hidden>
   <button type="button" onclick="document.getElementById('hunde-formular').style.removeProperty('display'); document.getElementById('hunde-formular').hidden = true;" style="float:right; background:#d0eefe; color:#17324d; border:none; border-radius:10px; padding:8px 14px; cursor:pointer;">✕ Schließen</button>

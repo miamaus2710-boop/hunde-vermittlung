@@ -2635,22 +2635,30 @@ groesse.textContent =
     ? "ca. " + hund.groesse + " cm"
     : "Nicht bekannt");
 
-inhalt.append(name, status, alter, geschlecht, groesse);
-        const zaehler = zaehlerProHund.get(String(hund.id)) || {};
+inhalt.append(name);
 
-const markierungenAnzeige = document.createElement("p");
-markierungenAnzeige.textContent =
-  `❤️ ${Number(zaehler.favoriten_markierungen || 0)} Markierungen`;
-inhalt.append(markierungenAnzeige);
+const zaehler = zaehlerProHund.get(String(hund.id)) || {};
+
+const zaehlerZeile = document.createElement("div");
+zaehlerZeile.style.cssText =
+  "display:flex;align-items:center;gap:10px;font-size:13px;opacity:.65;margin:2px 0 8px;";
+
+const herzAnzeige = document.createElement("span");
+herzAnzeige.textContent =
+  `❤️ ${Number(zaehler.favoriten_markierungen || 0)}`;
+zaehlerZeile.append(herzAnzeige);
 
 const verwaltung = document.getElementById("verwaltung");
 
 if (verwaltung && !verwaltung.hidden) {
-  const klicksAnzeige = document.createElement("p");
+  const klicksAnzeige = document.createElement("span");
   klicksAnzeige.textContent =
-    `👁️ ${Number(zaehler.klicks || 0)} Klicks`;
-  inhalt.append(klicksAnzeige);
+    `👁️ ${Number(zaehler.klicks || 0)}`;
+  zaehlerZeile.append(klicksAnzeige);
 }
+
+inhalt.append(zaehlerZeile);
+inhalt.append(status, alter, geschlecht, groesse);
 
     karte.append(inhalt);
     liste.append(karte);

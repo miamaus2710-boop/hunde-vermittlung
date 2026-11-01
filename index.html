@@ -2517,7 +2517,20 @@ counter.textContent = favoritenAnsicht
   const liste = document.getElementById("hundeliste");
   liste.innerHTML = "";
 
-  data.forEach(hund => {
+  const { data: zaehlerDaten, error: zaehlerFehler } =
+  await supabaseClient.rpc("oeffentliche_hunde_zaehler");
+
+if (zaehlerFehler) {
+  console.error("Fehler beim Laden der Karten-Zähler:", zaehlerFehler);
+}
+
+const zaehlerProHund = new Map(
+  (zaehlerDaten || []).map(eintrag => [
+    String(eintrag.hund_id),
+    eintrag
+  ])
+);
+      data.forEach(hund => {
     if (favoritenAnsicht && !istFavorit(hund.id)) return;
     const karte = document.createElement("div");
     karte.className = "hund";
@@ -2623,6 +2636,21 @@ groesse.textContent =
     : "Nicht bekannt");
 
 inhalt.append(name, status, alter, geschlecht, groesse);
+        const zaehler = zaehlerProHund.get(String(hund.id)) || {};
+
+const markierungenAnzeige = document.createElement("p");
+markierungenAnzeige.textContent =
+  `❤️ ${Number(zaehler.favoriten_markierungen || 0)} Markierungen`;
+inhalt.append(markierungenAnzeige);
+
+const verwaltung = document.getElementById("verwaltung");
+
+if (verwaltung && !verwaltung.hidden) {
+  const klicksAnzeige = document.createElement("p");
+  klicksAnzeige.textContent =
+    `👁️ ${Number(zaehler.klicks || 0)} Klicks`;
+  inhalt.append(klicksAnzeige);
+}
 
     karte.append(inhalt);
     liste.append(karte);

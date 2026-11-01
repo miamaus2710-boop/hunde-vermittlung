@@ -2313,6 +2313,10 @@ function zurStartseite(ausVerlauf = false) {
 
   details.hidden = true;
   liste.style.display = "";
+  document.querySelector("main > h2").style.removeProperty("display");
+document.getElementById("hunde-counter").style.removeProperty("display");
+document.querySelector('label[for="hundesortierung"]').style.removeProperty("display");
+document.getElementById("hundesortierung").style.removeProperty("display");
   filterButton.style.display = "";
   filter.hidden = true;
   filter.style.removeProperty("display");
@@ -2341,6 +2345,10 @@ function zeigeHund(hund) {
   const liste = document.getElementById("hundeliste");
 
   liste.style.display = "none";
+  document.querySelector("main > h2").style.display = "none";
+document.getElementById("hunde-counter").style.display = "none";
+document.querySelector('label[for="hundesortierung"]').style.display = "none";
+document.getElementById("hundesortierung").style.display = "none";
   document.getElementById("hundefilter").style.display = "none";
   document.getElementById("filter-oeffnen").style.display = "none";
   details.hidden = false;
@@ -2804,6 +2812,10 @@ zeigeFotoVorschau();
   }
 
   details.hidden = true;
+      document.querySelector("main > h2").style.removeProperty("display");
+document.getElementById("hunde-counter").style.removeProperty("display");
+document.querySelector('label[for="hundesortierung"]').style.removeProperty("display");
+document.getElementById("hundesortierung").style.removeProperty("display");
   document.getElementById("hundefilter").style.display = "";
   document.getElementById("hundeliste").style.display = "";
  await aktualisiereHundekarten();

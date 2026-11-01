@@ -1542,6 +1542,21 @@ header p {
 </header>
 
   <main>
+    <div id="hunde-statistik" hidden>
+  <h2>📊 Hunde-Statistik</h2>
+  <p>
+    Gezählt werden Detailaufrufe, gesetzte Herz-Markierungen
+    und aktuell aktive Favoriten.
+  </p>
+  <button
+    type="button"
+    id="hunde-statistik-aktualisieren"
+    onclick="ladeHundeStatistik()"
+  >
+    Statistik aktualisieren
+  </button>
+  <div id="hunde-statistik-inhalt" aria-live="polite"></div>
+</div>
     <h2>Unsere Schützlinge</h2>
     <p
   id="hunde-counter"
@@ -1980,21 +1995,7 @@ header p {
   </dialog>
   </main>
   <section id="verwaltung" hidden>
-    <div id="hunde-statistik" hidden>
-  <h2>📊 Hunde-Statistik</h2>
-  <p>
-    Gezählt werden Detailaufrufe, gesetzte Herz-Markierungen
-    und aktuell aktive Favoriten.
-  </p>
-  <button
-    type="button"
-    id="hunde-statistik-aktualisieren"
-    onclick="ladeHundeStatistik()"
-  >
-    Statistik aktualisieren
-  </button>
-  <div id="hunde-statistik-inhalt" aria-live="polite"></div>
-</div>
+    
     <div id="hunde-formular" hidden>
   <button type="button" onclick="document.getElementById('hunde-formular').style.removeProperty('display'); document.getElementById('hunde-formular').hidden = true;" style="float:right; background:#d0eefe; color:#17324d; border:none; border-radius:10px; padding:8px 14px; cursor:pointer;">✕ Schließen</button>
 

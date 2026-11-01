@@ -2322,9 +2322,36 @@ async function aktualisiereHundFavorit(hund, favorisiert) {
     console.warn("Favoriten-Statistik konnte nicht gespeichert werden:", error);
   }
 
-   {
-    await aktualisiereHundekarten();
-  }
+  const ladeOverlay = document.createElement("div");
+ladeOverlay.style.cssText = `
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 99999;
+`;
+
+const pfote = document.createElement("span");
+pfote.textContent = "🐾";
+pfote.style.fontSize = "68px";
+pfote.animate(
+  [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+  { duration: 900, iterations: Infinity }
+);
+
+ladeOverlay.appendChild(pfote);
+document.body.appendChild(ladeOverlay);
+
+try {
+  await Promise.all([
+    aktualisiereHundekarten(),
+    new Promise(resolve => setTimeout(resolve, 1200))
+  ]);
+} finally {
+  ladeOverlay.remove();
+}
 
   if (!document.getElementById("hunde-statistik").hidden) {
     await ladeHundeStatistik();

@@ -2363,100 +2363,199 @@ zurueck.style.cursor = "pointer";
 
   details.append(zurueck);
 if (hund.fotos && hund.fotos.length > 0) {
+  if (!document.getElementById("hundegalerie-stil")) {
+    const stil = document.createElement("style");
+    stil.id = "hundegalerie-stil";
+    stil.textContent = `
+      .hundegalerie {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 110px;
+        gap: 12px;
+        align-items: center;
+        width: 100%;
+        margin: 20px 0;
+      }
+
+      .hundegalerie-bildbereich {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        min-width: 0;
+      }
+
+      .hundegalerie-hauptbild {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        max-height: 500px;
+        height: auto;
+        object-fit: contain;
+        border-radius: 12px;
+        touch-action: pan-y;
+      }
+
+      .hundegalerie-pfeil {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: #BDE0FE;
+        color: #17324D;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
+      .hundegalerie-pfeil-links {
+        left: 10px;
+      }
+
+      .hundegalerie-pfeil-rechts {
+        right: 10px;
+      }
+
+      .hundegalerie-vorschauen {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      .hundegalerie-mini {
+        flex: 0 0 auto;
+        width: 110px;
+        height: 95px;
+        box-sizing: border-box;
+        object-fit: cover;
+        border: 3px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      @media (max-width: 767px) {
+        .hundegalerie {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 10px;
+        }
+
+        .hundegalerie-hauptbild {
+          max-height: 60vh;
+        }
+
+        .hundegalerie-vorschauen {
+          flex-direction: row;
+          max-height: none;
+          overflow-x: auto;
+          overflow-y: hidden;
+          padding-bottom: 4px;
+        }
+
+        .hundegalerie-mini {
+          flex-basis: 100px;
+          width: 100px;
+          height: 85px;
+        }
+      }
+    `;
+    document.head.append(stil);
+  }
+
   const galerie = document.createElement("div");
-  galerie.style.display = "flex";
-  galerie.style.justifyContent = "flex-start";
-galerie.style.width = "fit-content";
-galerie.style.maxWidth = "100%";
-  galerie.style.flexWrap = "wrap";
-  galerie.style.gap = "8px";
-  galerie.style.margin = "20px 0";
-  galerie.style.alignItems = "center";
+  galerie.className = "hundegalerie";
 
   let aktuellesBild = 0;
+  let startX = 0;
+  let startY = 0;
+
   const bildbereich = document.createElement("div");
-bildbereich.style.width = "auto";
-bildbereich.style.maxWidth = "100%";
-bildbereich.style.height = "auto";
-bildbereich.style.display = "flex";
-bildbereich.style.alignItems = "center";
-bildbereich.style.justifyContent = "center";
-bildbereich.style.flexShrink = "1";
-bildbereich.style.minWidth = "0";
+  bildbereich.className = "hundegalerie-bildbereich";
+
   const hauptbild = document.createElement("img");
-  hauptbild.src = hund.fotos[0];
-  function wechsleBild(richtung) {
-  aktuellesBild = (aktuellesBild + richtung + hund.fotos.length) % hund.fotos.length;
-  hauptbild.src = hund.fotos[aktuellesBild];
-}
+  hauptbild.className = "hundegalerie-hauptbild";
   hauptbild.alt = "Foto von " + hund.name;
-  hauptbild.style.width = "auto";
-  hauptbild.style.maxHeight = "500px";
-  hauptbild.style.maxWidth = "100%";
-  hauptbild.style.height = "auto";
-  hauptbild.style.objectFit = "contain";
-hauptbild.style.objectPosition = "center";
-  hauptbild.style.borderRadius = "12px";
-  hauptbild.style.backgroundColor = "transparent";
+
+  const vorschauen = document.createElement("div");
+  vorschauen.className = "hundegalerie-vorschauen";
+
+  const miniaturen = [];
+
+  function aktualisiereBild() {
+    hauptbild.src = hund.fotos[aktuellesBild];
+
+    miniaturen.forEach((mini, index) => {
+      mini.style.borderColor =
+        index === aktuellesBild ? "#8DE0FE" : "transparent";
+    });
+  }
+
+  function wechsleBild(richtung) {
+    aktuellesBild =
+      (aktuellesBild + richtung + hund.fotos.length) % hund.fotos.length;
+    aktualisiereBild();
+  }
 
   const pfeilLinks = document.createElement("button");
-pfeilLinks.textContent = "❮";
-pfeilLinks.style.backgroundColor = "#BDE0FE";
-pfeilLinks.style.color = "#17324D";
-pfeilLinks.style.border = "none";
-pfeilLinks.style.borderRadius = "50%";
-pfeilLinks.style.width = "44px";
-pfeilLinks.style.height = "44px";
-pfeilLinks.style.fontSize = "24px";
-pfeilLinks.style.cursor = "pointer";
-pfeilLinks.onclick = () => wechsleBild(-1);
+  pfeilLinks.type = "button";
+  pfeilLinks.className =
+    "hundegalerie-pfeil hundegalerie-pfeil-links";
+  pfeilLinks.textContent = "❮";
+  pfeilLinks.setAttribute("aria-label", "Vorheriges Bild");
+  pfeilLinks.onclick = () => wechsleBild(-1);
+
   const pfeilRechts = document.createElement("button");
-pfeilRechts.textContent = "❯";
-pfeilRechts.style.backgroundColor = "#BDE0FE";
-pfeilRechts.style.color = "#17324D";
-pfeilRechts.style.border = "none";
-pfeilRechts.style.borderRadius = "50%";
-pfeilRechts.style.width = "44px";
-pfeilRechts.style.height = "44px";
-pfeilRechts.style.fontSize = "24px";
-pfeilRechts.style.cursor = "pointer";
-pfeilRechts.onclick = () => wechsleBild(1);
-  const vorschauen = document.createElement("div");
-  vorschauen.style.display = "flex";
-  vorschauen.style.flexDirection = "column";
-  vorschauen.style.gap = "10px";
-  vorschauen.style.maxHeight = "500px";
-  vorschauen.style.overflowY = "auto";
+  pfeilRechts.type = "button";
+  pfeilRechts.className =
+    "hundegalerie-pfeil hundegalerie-pfeil-rechts";
+  pfeilRechts.textContent = "❯";
+  pfeilRechts.setAttribute("aria-label", "Nächstes Bild");
+  pfeilRechts.onclick = () => wechsleBild(1);
 
   hund.fotos.forEach((foto, index) => {
     const mini = document.createElement("img");
     mini.src = foto;
     mini.alt = "Foto " + (index + 1);
-    mini.style.width = "110px";
-    mini.style.height = "95px";
-    mini.style.objectFit = "cover";
-    mini.style.borderRadius = "8px";
-    mini.style.cursor = "pointer";
-    mini.style.border = index === 0
-      ? "3px solid #8DE0FE"
-      : "3px solid transparent";
+    mini.className = "hundegalerie-mini";
 
     mini.onclick = () => {
-      hauptbild.src = foto;
-
-      vorschauen.querySelectorAll("img").forEach(bild => {
-        bild.style.border = "3px solid transparent";
-      });
-
-      mini.style.border = "3px solid #8DE0FE";
+      aktuellesBild = index;
+      aktualisiereBild();
     };
 
+    miniaturen.push(mini);
     vorschauen.append(mini);
   });
 
-bildbereich.append(hauptbild);
-galerie.append(pfeilLinks, bildbereich, pfeilRechts, vorschauen);
+  bildbereich.addEventListener("touchstart", event => {
+    startX = event.changedTouches[0].screenX;
+    startY = event.changedTouches[0].screenY;
+  }, { passive: true });
+
+  bildbereich.addEventListener("touchend", event => {
+    const endeX = event.changedTouches[0].screenX;
+    const endeY = event.changedTouches[0].screenY;
+    const unterschiedX = endeX - startX;
+    const unterschiedY = endeY - startY;
+
+    if (
+      Math.abs(unterschiedX) > 45 &&
+      Math.abs(unterschiedX) > Math.abs(unterschiedY)
+    ) {
+      wechsleBild(unterschiedX < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+
+  bildbereich.append(hauptbild, pfeilLinks, pfeilRechts);
+  galerie.append(bildbereich, vorschauen);
   details.append(galerie);
+
+  aktualisiereBild();
 }
   const titel = document.createElement("h2");
   titel.textContent = hund.name;

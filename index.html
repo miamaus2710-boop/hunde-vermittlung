@@ -429,6 +429,104 @@ header p {
   transform: translateY(-6px);
   box-shadow: 0 16px 38px rgba(70, 45, 30, 0.20);
 }
+.hund {
+  position: relative;
+}
+
+.favorit-herz {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .94);
+  color: #b84e68;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(20, 40, 60, .20);
+}
+
+.favorit-herz.aktiv {
+  color: #e3345d;
+}
+
+.hund .favorit-herz {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  right: 12px;
+}
+
+#favoriten-ansicht {
+  margin: 8px 8px 12px 0;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #dceeff;
+  color: #17324d;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#favoriten-ansicht.aktiv {
+  background: #fce4eb;
+  color: #9e2441;
+}
+
+#hunde-statistik {
+  margin: 18px 0 24px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #edf6fc;
+  color: #17324d;
+}
+
+#hunde-statistik table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#hunde-statistik th,
+#hunde-statistik td {
+  padding: 9px 12px;
+  border-bottom: 1px solid #d2e2ef;
+  text-align: left;
+}
+
+#hunde-statistik th:nth-child(n+2),
+#hunde-statistik td:nth-child(n+2) {
+  text-align: center;
+}
+
+#hunde-statistik-aktualisieren {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #bde0fe;
+  color: #17324d;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  #favoriten-ansicht {
+    width: 100%;
+    margin: 0 0 10px;
+    min-height: 46px;
+  }
+
+  #hunde-statistik {
+    overflow-x: auto;
+    padding: 14px;
+  }
+
+  #hunde-statistik table {
+    min-width: 560px;
+  }
+}
 
 .hund img {
   display: block;
@@ -1452,6 +1550,13 @@ header p {
 >
   🐾 Hunde werden gezählt …
 </p>
+    <button
+  type="button"
+  id="favoriten-ansicht"
+  onclick="toggleFavoritenansicht()"
+>
+  ♡ Favoriten (0)
+</button>
     <label for="hundesortierung">Sortieren:</label>
 <select
   id="hundesortierung"
@@ -1875,6 +1980,21 @@ header p {
   </dialog>
   </main>
   <section id="verwaltung" hidden>
+    <div id="hunde-statistik" hidden>
+  <h2>📊 Hunde-Statistik</h2>
+  <p>
+    Gezählt werden Detailaufrufe, gesetzte Herz-Markierungen
+    und aktuell aktive Favoriten.
+  </p>
+  <button
+    type="button"
+    id="hunde-statistik-aktualisieren"
+    onclick="ladeHundeStatistik()"
+  >
+    Statistik aktualisieren
+  </button>
+  <div id="hunde-statistik-inhalt" aria-live="polite"></div>
+</div>
     <div id="hunde-formular" hidden>
   <button type="button" onclick="document.getElementById('hunde-formular').style.removeProperty('display'); document.getElementById('hunde-formular').hidden = true;" style="float:right; background:#d0eefe; color:#17324d; border:none; border-radius:10px; padding:8px 14px; cursor:pointer;">✕ Schließen</button>
 
@@ -2099,6 +2219,213 @@ aktionen.append(titelButton,loeschButton);
     bereich.append(kachel);
   });
 }
+    const FAVORITEN_KEY = "srn_hunde_favoriten_v1";
+const BESUCHER_KEY = "srn_hunde_besucher_v1";
+let favoritenAnsicht = false;
+
+function holeFavoriten() {
+  try {
+    const gespeichert =
+      JSON.parse(localStorage.getItem(FAVORITEN_KEY) || "[]");
+    return Array.isArray(gespeichert)
+      ? gespeichert.map(String)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function speichereFavoriten(favoriten) {
+  try {
+    localStorage.setItem(FAVORITEN_KEY, JSON.stringify(favoriten));
+  } catch (error) {
+    console.warn("Favoriten konnten nicht gespeichert werden:", error);
+  }
+}
+
+function holeBesucherId() {
+  const neu = () =>
+    crypto.randomUUID
+      ? crypto.randomUUID()
+      : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+          const r = Math.random() * 16 | 0;
+          return (c === "x" ? r : (r & 3 | 8)).toString(16);
+        });
+
+  try {
+    let id = localStorage.getItem(BESUCHER_KEY);
+    if (!id) {
+      id = neu();
+      localStorage.setItem(BESUCHER_KEY, id);
+    }
+    return id;
+  } catch {
+    return neu();
+  }
+}
+
+const besucherId = holeBesucherId();
+
+function istFavorit(hundId) {
+  return holeFavoriten().includes(String(hundId));
+}
+
+function aktualisiereFavoritenButton() {
+  const button = document.getElementById("favoriten-ansicht");
+  if (!button) return;
+
+  const anzahl = holeFavoriten().length;
+  button.textContent = favoritenAnsicht
+    ? `← Alle Hunde (${anzahl})`
+    : `♡ Favoriten (${anzahl})`;
+
+  button.classList.toggle("aktiv", favoritenAnsicht);
+}
+
+function toggleFavoritenansicht() {
+  favoritenAnsicht = !favoritenAnsicht;
+  aktualisiereFavoritenButton();
+  aktualisiereHundekarten();
+}
+async function aktualisiereHundFavorit(hund, favorisiert) {
+  const favoriten = new Set(holeFavoriten());
+  const id = String(hund.id);
+
+  if (favorisiert) favoriten.add(id);
+  else favoriten.delete(id);
+
+  speichereFavoriten(Array.from(favoriten));
+  aktualisiereFavoritenButton();
+
+  document.querySelectorAll(".favorit-herz").forEach(button => {
+    if (button.dataset.hundId !== id) return;
+
+    button.classList.toggle("aktiv", favorisiert);
+    button.textContent = favorisiert ? "♥" : "♡";
+
+    const beschriftung = favorisiert
+      ? hund.name + " aus Favoriten entfernen"
+      : hund.name + " zu Favoriten hinzufügen";
+
+    button.setAttribute("aria-label", beschriftung);
+    button.title = beschriftung;
+  });
+
+  const { error } = await supabaseClient.rpc("set_hund_favorite", {
+    p_hund_id: id,
+    p_visitor_id: besucherId,
+    p_is_favorite: favorisiert
+  });
+
+  if (error) {
+    console.warn("Favoriten-Statistik konnte nicht gespeichert werden:", error);
+  }
+
+  if (favoritenAnsicht) {
+    await aktualisiereHundekarten();
+  }
+
+  if (!document.getElementById("hunde-statistik").hidden) {
+    await ladeHundeStatistik();
+  }
+}
+
+async function registriereHundKlick(hundId) {
+  const { error } = await supabaseClient.rpc("record_hund_view", {
+    p_hund_id: String(hundId),
+    p_visitor_id: besucherId
+  });
+
+  if (error) {
+    console.warn("Klick-Statistik konnte nicht gespeichert werden:", error);
+  }
+
+  if (!document.getElementById("hunde-statistik").hidden) {
+    await ladeHundeStatistik();
+  }
+}
+
+async function ladeHundeStatistik() {
+  const inhalt = document.getElementById("hunde-statistik-inhalt");
+  inhalt.textContent = "Statistik wird geladen …";
+
+  const [
+    { data: hunde, error: hundeFehler },
+    { data: werte, error: werteFehler }
+  ] = await Promise.all([
+    supabaseClient.from("hunde").select("id,name"),
+    supabaseClient
+      .from("hunde_interaktionen")
+      .select("hund_id,klicks,favoriten_markierungen,favorisiert")
+  ]);
+
+  if (hundeFehler || werteFehler) {
+    inhalt.textContent =
+      "Statistik konnte nicht geladen werden. Bitte SQL und Berechtigungen prüfen.";
+    console.error("Statistikfehler:", hundeFehler || werteFehler);
+    return;
+  }
+
+  const summen = new Map();
+
+  (werte || []).forEach(eintrag => {
+    const id = String(eintrag.hund_id);
+    const summe = summen.get(id) || {
+      klicks: 0,
+      markierungen: 0,
+      favoriten: 0
+    };
+
+    summe.klicks += Number(eintrag.klicks || 0);
+    summe.markierungen += Number(eintrag.favoriten_markierungen || 0);
+    if (eintrag.favorisiert) summe.favoriten++;
+
+    summen.set(id, summe);
+  });
+
+  const sortiert = (hunde || [])
+    .map(hund => ({
+      name: hund.name || "Unbekannt",
+      ...(summen.get(String(hund.id)) || {
+        klicks: 0,
+        markierungen: 0,
+        favoriten: 0
+      })
+    }))
+    .sort((a, b) =>
+      b.klicks - a.klicks ||
+      b.markierungen - a.markierungen ||
+      a.name.localeCompare(b.name, "de")
+    );
+
+  const tabelle = document.createElement("table");
+  tabelle.innerHTML =
+    "<thead><tr><th>Hund</th><th>Detailaufrufe</th>" +
+    "<th>Herz-Markierungen</th><th>Aktuell Favoriten</th></tr></thead>";
+
+  const tbody = document.createElement("tbody");
+
+  sortiert.forEach(eintrag => {
+    const zeile = document.createElement("tr");
+
+    [
+      eintrag.name,
+      String(eintrag.klicks),
+      String(eintrag.markierungen),
+      String(eintrag.favoriten)
+    ].forEach(text => {
+      const zelle = document.createElement("td");
+      zelle.textContent = text;
+      zeile.append(zelle);
+    });
+
+    tbody.append(zeile);
+  });
+
+  tabelle.append(tbody);
+  inhalt.replaceChildren(tabelle);
+}
+
     function filtern() {
   const suche = document.getElementById("suche").value.trim().toLowerCase();
   const status = document.getElementById("status").value;
@@ -2178,15 +2505,19 @@ aktionen.append(titelButton,loeschButton);
   const counter = document.getElementById("hunde-counter");
 
 if (counter) {
-  const anzahl = data.length;
+ const anzahl = favoritenAnsicht
+  ? data.filter(hund => istFavorit(hund.id)).length
+  : data.length;
 
-  counter.textContent =
-    `🐾 Aktuell ${anzahl} ${anzahl === 1 ? "Hund" : "Hunde"}`;
+counter.textContent = favoritenAnsicht
+  ? `♡ ${anzahl} ${anzahl === 1 ? "Favorit" : "Favoriten"}`
+  : `🐾 Aktuell ${anzahl} ${anzahl === 1 ? "Hund" : "Hunde"}`;
 }
   const liste = document.getElementById("hundeliste");
   liste.innerHTML = "";
 
   data.forEach(hund => {
+    if (favoritenAnsicht && !istFavorit(hund.id)) return;
     const karte = document.createElement("div");
     karte.className = "hund";
     karte.style.cursor = "pointer";
@@ -2202,6 +2533,29 @@ if (hund.fotos && hund.fotos.length > 0) {
   bild.alt = "Foto von " + hund.name;
   karte.append(bild);
 }
+    const herz = document.createElement("button");
+herz.type = "button";
+herz.dataset.hundId = String(hund.id);
+herz.className =
+  "favorit-herz" + (istFavorit(hund.id) ? " aktiv" : "");
+herz.textContent = istFavorit(hund.id) ? "♥" : "♡";
+
+herz.setAttribute(
+  "aria-label",
+  istFavorit(hund.id)
+    ? hund.name + " aus Favoriten entfernen"
+    : hund.name + " zu Favoriten hinzufügen"
+);
+
+herz.title = herz.getAttribute("aria-label");
+
+herz.addEventListener("click", event => {
+  event.stopPropagation();
+  aktualisiereHundFavorit(hund, !istFavorit(hund.id));
+});
+
+karte.append(herz);
+
     const inhalt = document.createElement("div");
     inhalt.className = "inhalt";
 
@@ -2325,6 +2679,9 @@ document.getElementById("hundesortierung").style.removeProperty("display");
 }
 
 function zeigeHund(hund) {
+  if (!navigationWiederherstellung) {
+  registriereHundKlick(hund.id);
+}
   const hundSchluessel = String(hund.id);
   navigationHunde.set(hundSchluessel, hund);
 
@@ -2370,6 +2727,24 @@ zurueck.style.cursor = "pointer";
 };
 
   details.append(zurueck);
+  const detailHerz = document.createElement("button");
+detailHerz.type = "button";
+detailHerz.dataset.hundId = String(hund.id);
+detailHerz.className =
+  "favorit-herz" + (istFavorit(hund.id) ? " aktiv" : "");
+detailHerz.textContent = istFavorit(hund.id) ? "♥" : "♡";
+detailHerz.setAttribute(
+  "aria-label",
+  istFavorit(hund.id)
+    ? hund.name + " aus Favoriten entfernen"
+    : hund.name + " zu Favoriten hinzufügen"
+);
+detailHerz.title = detailHerz.getAttribute("aria-label");
+detailHerz.style.margin = "18px 0 0 12px";
+detailHerz.addEventListener("click", () => {
+  aktualisiereHundFavorit(hund, !istFavorit(hund.id));
+});
+details.append(detailHerz);
 if (hund.fotos && hund.fotos.length > 0) {
   if (!document.getElementById("hundegalerie-stil")) {
     const stil = document.createElement("style");
@@ -2781,6 +3156,7 @@ zeigeFotoVorschau();
   document.getElementById("hunde-formular").hidden = false;
       document.getElementById("hunde-formular").style.display = "block";
   document.getElementById("verwaltung").hidden = false;
+
 };
   
     const loeschen = document.createElement("button");
@@ -2832,6 +3208,7 @@ document.getElementById("hundesortierung").style.removeProperty("display");
   details.append(bearbeiten, loeschen);
 });
 }
+    aktualisiereFavoritenButton();
 aktualisiereHundekarten();
     document.getElementById("login-button").onclick = async () => {
   const email = document.getElementById("login-email").value.trim();
@@ -2866,6 +3243,8 @@ document.getElementById("logout-benutzer").textContent =
   "Angemeldet als " + mitarbeiter.rolle;
 document.getElementById("mitarbeiter-login").hidden = true;
   document.getElementById("verwaltung").hidden = false;
+  document.getElementById("hunde-statistik").hidden = false;
+ladeHundeStatistik();
 }
   }
 };
@@ -2911,6 +3290,7 @@ document.getElementById("logout-button").onclick = async () => {
   }
 
   document.getElementById("verwaltung").hidden = true;
+  document.getElementById("hunde-statistik").hidden = true;
   document.getElementById("logout-bereich").hidden = true;
   document.getElementById("login-leiste").hidden = false;
   document.getElementById("mitarbeiter-login").hidden = true;
@@ -2937,6 +3317,8 @@ document.getElementById("logout-button").onclick = async () => {
   }
 
   document.getElementById("verwaltung").hidden = false;
+      document.getElementById("hunde-statistik").hidden = false;
+ladeHundeStatistik();
   document.getElementById("login-meldung").textContent =
     "Angemeldet als " + mitarbeiter.rolle;
       document.getElementById("logout-bereich").hidden = false;

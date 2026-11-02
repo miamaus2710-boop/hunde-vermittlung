@@ -3240,10 +3240,27 @@ wertSetzen("hund-raum-nummer", standortBearbeitung?.raum_nummer);
   wertSetzen("hund-status", hund.status);
    document.getElementById("hund-sichtbar").checked = hund.sichtbar === true;   
   wertSetzen("hund-beschreibung", hund.beschreibung);
-      document.querySelectorAll(
-  'input[name="hund-charakter"]'
-).forEach(checkbox => {
-  checkbox.checked = (hund.charakter || []).includes(checkbox.value);
+ let gespeicherterCharakter = hund.charakter;
+
+if (typeof gespeicherterCharakter === "string") {
+  try {
+    const geparst = JSON.parse(gespeicherterCharakter);
+    gespeicherterCharakter = Array.isArray(geparst)
+      ? geparst
+      : [gespeicherterCharakter];
+  } catch {
+    gespeicherterCharakter = [gespeicherterCharakter];
+  }
+}
+
+if (!Array.isArray(gespeicherterCharakter)) {
+  gespeicherterCharakter = [];
+}
+
+document.querySelectorAll('input[name="hund-charakter"]').forEach(checkbox => {
+  const charakterWert = checkbox.getAttribute("value") || "";
+  checkbox.value = charakterWert;
+  checkbox.checked = gespeicherterCharakter.includes(charakterWert);
 });
       fotosInBearbeitung.forEach(foto => {
   if (foto.datei) {
@@ -3340,28 +3357,6 @@ aktualisiereHundekarten();
   .eq("user_id", data.user.id)
   .maybeSingle();
 
-let gespeicherterCharakter = hund.charakter;
-
-if (typeof gespeicherterCharakter === "string") {
-  try {
-    const geparst = JSON.parse(gespeicherterCharakter);
-    gespeicherterCharakter = Array.isArray(geparst)
-      ? geparst
-      : [gespeicherterCharakter];
-  } catch {
-    gespeicherterCharakter = [gespeicherterCharakter];
-  }
-}
-
-if (!Array.isArray(gespeicherterCharakter)) {
-  gespeicherterCharakter = [];
-}
-
-document.querySelectorAll('input[name="hund-charakter"]').forEach(checkbox => {
-  const charakterWert = checkbox.getAttribute("value") || "";
-  checkbox.value = charakterWert;
-  checkbox.checked = gespeicherterCharakter.includes(charakterWert);
-});
   meldung.textContent = "Angemeldet als " + mitarbeiter.rolle;
   document.getElementById("logout-bereich").hidden = false;
   document.getElementById("login-leiste").hidden = true;

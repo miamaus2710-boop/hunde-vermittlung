@@ -2104,7 +2104,23 @@ header p {
 <label><input type="checkbox" name="hund-charakter" value="Unsicher, nimmt aber Leckerlis"> Unsicher, nimmt aber Leckerlis</label>
 <label><input type="checkbox" name="hund-charakter" value="Zutraulich: lässt sich anfassen"> Zutraulich: lässt sich anfassen</label>      
 </div>
+<div class="interne-unterbringung" id="sonstiges-bereich">
+  <h3>🐾 Sonstiges</h3>
 
+  <label for="hund-leinenfuehrig">Leinenführig</label>
+  <select id="hund-leinenfuehrig">
+    <option value="Nicht getestet">Nicht getestet</option>
+    <option value="Ja">Ja</option>
+    <option value="Nein">Nein</option>
+  </select>
+
+  <label for="hund-katzenvertraeglichkeit">Katzenverträglichkeit</label>
+  <select id="hund-katzenvertraeglichkeit">
+    <option value="Nicht getestet">Nicht getestet</option>
+    <option value="Ja">Ja</option>
+    <option value="Nein">Nein</option>
+  </select>
+</div>
   <label>Beschreibung</label>
   <textarea id="hund-beschreibung"
     placeholder="Beschreibe den Hund..."></textarea>
@@ -3072,6 +3088,8 @@ const angaben = [
   ["Geimpft", hund.geimpft],
   ["Gechipt", hund.gechipt],
   ["Kastriert", hund.kastriert],
+  ["Leinenführig", hund.leinenfuehrig || "Nicht getestet"],
+["Katzenverträglichkeit", hund.katzenvertraeglichkeit || "Nicht getestet"],
  ["Status", hund.status],
 ["Charakter", (() => {
   let charakter = hund.charakter;
@@ -3241,6 +3259,11 @@ wertSetzen("hund-raum-nummer", standortBearbeitung?.raum_nummer);
   wertSetzen("hund-geimpft", hund.geimpft);
   wertSetzen("hund-gechipt", hund.gechipt);
   wertSetzen("hund-kastriert", hund.kastriert);
+  wertSetzen("hund-leinenfuehrig", hund.leinenfuehrig || "Nicht getestet");
+wertSetzen(
+  "hund-katzenvertraeglichkeit",
+  hund.katzenvertraeglichkeit || "Nicht getestet"
+);    
   wertSetzen("hund-status", hund.status);
    document.getElementById("hund-sichtbar").checked = hund.sichtbar === true;   
   wertSetzen("hund-beschreibung", hund.beschreibung);
@@ -3390,6 +3413,8 @@ document.getElementById("formular-titel").textContent = "🐾 Neuen Hund eintrag
   'input:not([type="file"]):not([type="checkbox"]), textarea'
 ).forEach(feld => feld.value = "");
   document.getElementById("hund-sichtbar").checked = true;
+  document.getElementById("hund-leinenfuehrig").value = "Nicht getestet";
+document.getElementById("hund-katzenvertraeglichkeit").value = "Nicht getestet";
   document.querySelectorAll('input[name="hund-charakter"]').forEach(checkbox => {
   checkbox.checked = false;
   checkbox.value = checkbox.getAttribute("value") || "";
@@ -3496,6 +3521,8 @@ const ladeStart = Date.now();
     geimpft: wert("hund-geimpft"),
     gechipt: wert("hund-gechipt"),
     kastriert: wert("hund-kastriert"),
+    leinenfuehrig: wert("hund-leinenfuehrig") || "Nicht getestet",
+katzenvertraeglichkeit: wert("hund-katzenvertraeglichkeit") || "Nicht getestet",
 status: wert("hund-status"),
 sichtbar: document.getElementById("hund-sichtbar").checked,
 charakter: Array.from(

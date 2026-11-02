@@ -3336,7 +3336,7 @@ document.getElementById("hundesortierung").style.removeProperty("display");
 }
     aktualisiereFavoritenButton();
 aktualisiereHundekarten();
-    document.getElementById("login-button").onclick = async () => {
+  document.getElementById("login-button").onclick = async () => {
   const email = document.getElementById("login-email").value.trim();
   const passwort = document.getElementById("login-passwort").value;
   const meldung = document.getElementById("login-meldung");
@@ -3352,21 +3352,29 @@ aktualisiereHundekarten();
     meldung.textContent = "Anmeldung fehlgeschlagen. Bitte Zugangsdaten prüfen.";
   } else {
     const { data: mitarbeiter, error: rollenFehler } = await supabaseClient
-  .from("mitarbeiter")
-  .select("rolle")
-  .eq("user_id", data.user.id)
-  .maybeSingle();
+      .from("mitarbeiter")
+      .select("rolle")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
 
-  meldung.textContent = "Angemeldet als " + mitarbeiter.rolle;
-  document.getElementById("logout-bereich").hidden = false;
-  document.getElementById("login-leiste").hidden = true;
-document.getElementById("logout-benutzer").textContent =
-  "Angemeldet als " + mitarbeiter.rolle;
-document.getElementById("mitarbeiter-login").hidden = true;
-  document.getElementById("verwaltung").hidden = false;
-  document.getElementById("hunde-statistik").hidden = false;
-ladeHundeStatistik();
-}
+    if (
+      rollenFehler ||
+      !mitarbeiter ||
+      !["admin", "mitarbeiter"].includes(mitarbeiter.rolle)
+    ) {
+      meldung.textContent = "Kein Zugang zur Hunde-Verwaltung.";
+      await supabaseClient.auth.signOut();
+    } else {
+      meldung.textContent = "Angemeldet als " + mitarbeiter.rolle;
+      document.getElementById("logout-bereich").hidden = false;
+      document.getElementById("login-leiste").hidden = true;
+      document.getElementById("logout-benutzer").textContent =
+        "Angemeldet als " + mitarbeiter.rolle;
+      document.getElementById("mitarbeiter-login").hidden = true;
+      document.getElementById("verwaltung").hidden = false;
+      document.getElementById("hunde-statistik").hidden = false;
+      ladeHundeStatistik();
+    }
   }
 };
 document.getElementById("hund-hinzufuegen").onclick = () => {

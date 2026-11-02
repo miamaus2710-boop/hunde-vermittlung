@@ -3204,7 +3204,7 @@ bearbeiten.style.borderRadius = "12px";
 bearbeiten.style.padding = "12px 20px";
 bearbeiten.style.margin = "15px 0 0 0";
 bearbeiten.style.cursor = "pointer";
-    bearbeiten.onclick = () => {
+    bearbeiten.onclick = async () => {
   hundInBearbeitung = hund.id;
 window.bearbeiteHundId = hund.id;
       document.getElementById("formular-titel").textContent = "✏️ Hund bearbeiten – " + hund.name;
@@ -3218,9 +3218,20 @@ if (feld) feld.value = wert ?? "";
   wertSetzen("hund-geburtsdatum", hund.geburtsdatum);
   wertSetzen("hund-geschlecht", hund.geschlecht);
   wertSetzen("hund-aufenthaltsort", hund.aufenthaltsort);
-      wertSetzen("hund-arche", hund.arche);
-wertSetzen("hund-unterbringungsart", hund.unterbringungsart);
-wertSetzen("hund-raum-nummer", hund.raum_nummer);
+const { data: standortBearbeitung, error: standortLadeFehler } =
+  await supabaseClient
+    .from("hunde_standorte")
+    .select("arche, unterbringungsart, raum_nummer")
+    .eq("hund_id", hund.id)
+    .maybeSingle();
+
+if (standortLadeFehler) {
+  console.error("Unterbringung konnte nicht geladen werden:", standortLadeFehler);
+}
+
+wertSetzen("hund-arche", standortBearbeitung?.arche);
+wertSetzen("hund-unterbringungsart", standortBearbeitung?.unterbringungsart);
+wertSetzen("hund-raum-nummer", standortBearbeitung?.raum_nummer);
   wertSetzen("hund-groesse", hund.groesse);
   wertSetzen("hund-gewicht", hund.gewicht);
   wertSetzen("hund-geimpft", hund.geimpft);
@@ -3329,11 +3340,28 @@ aktualisiereHundekarten();
   .eq("user_id", data.user.id)
   .maybeSingle();
 
-if (rollenFehler || !mitarbeiter ||
-    !["admin", "mitarbeiter"].includes(mitarbeiter.rolle)) {
-  meldung.textContent = "Kein Zugang zur Hunde-Verwaltung.";
-  await supabaseClient.auth.signOut();
-} else {
+let gespeicherterCharakter = hund.charakter;
+
+if (typeof gespeicherterCharakter === "string") {
+  try {
+    const geparst = JSON.parse(gespeicherterCharakter);
+    gespeicherterCharakter = Array.isArray(geparst)
+      ? geparst
+      : [gespeicherterCharakter];
+  } catch {
+    gespeicherterCharakter = [gespeicherterCharakter];
+  }
+}
+
+if (!Array.isArray(gespeicherterCharakter)) {
+  gespeicherterCharakter = [];
+}
+
+document.querySelectorAll('input[name="hund-charakter"]').forEach(checkbox => {
+  const charakterWert = checkbox.getAttribute("value") || "";
+  checkbox.value = charakterWert;
+  checkbox.checked = gespeicherterCharakter.includes(charakterWert);
+});
   meldung.textContent = "Angemeldet als " + mitarbeiter.rolle;
   document.getElementById("logout-bereich").hidden = false;
   document.getElementById("login-leiste").hidden = true;
@@ -3351,12 +3379,13 @@ document.getElementById("hund-hinzufuegen").onclick = () => {
   hundInBearbeitung = null;
 window.bearbeiteHundId = null;
 document.getElementById("formular-titel").textContent = "🐾 Neuen Hund eintragen";
-  formular.querySelectorAll("input:not([type=file]), textarea").forEach(feld => feld.value = "");
+  formular.querySelectorAll(
+  'input:not([type="file"]):not([type="checkbox"]), textarea'
+).forEach(feld => feld.value = "");
   document.getElementById("hund-sichtbar").checked = true;
-  document.querySelectorAll(
-  'input[name="hund-charakter"]'
-).forEach(checkbox => {
+  document.querySelectorAll('input[name="hund-charakter"]').forEach(checkbox => {
   checkbox.checked = false;
+  checkbox.value = checkbox.getAttribute("value") || "";
 });
 
   fotosInBearbeitung.forEach(foto => {

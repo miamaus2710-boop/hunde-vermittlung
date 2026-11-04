@@ -2145,6 +2145,50 @@ header p {
     let hundInBearbeitung = null;
     let fotosInBearbeitung = [];
 let entfernteFotos = [];
+    // Verkleinert neue Fotos: WebP, gute Bildqualität,
+// maximal 2200 Pixel an der langen Kante.
+async function komprimiereHundfoto(datei) {
+  const bild = await createImageBitmap(datei);
+  const maxKante = 2200;
+  const faktor = Math.min(
+    1,
+    maxKante / Math.max(bild.width, bild.height)
+  );
+
+  const breite = Math.round(bild.width * faktor);
+  const hoehe = Math.round(bild.height * faktor);
+  const leinwand = document.createElement("canvas");
+  leinwand.width = breite;
+  leinwand.height = hoehe;
+
+  const kontext = leinwand.getContext("2d");
+  if (!kontext) {
+    bild.close();
+    throw new Error("Das Foto konnte im Browser nicht verarbeitet werden.");
+  }
+
+  kontext.drawImage(bild, 0, 0, breite, hoehe);
+  bild.close();
+
+  const blob = await new Promise((resolve, reject) => {
+    leinwand.toBlob(
+      ergebnis => ergebnis
+        ? resolve(ergebnis)
+        : reject(new Error("Die Bildkomprimierung ist fehlgeschlagen.")),
+      "image/webp",
+      0.84
+    );
+  });
+
+  // Ein kleines Original behalten, falls WebP keinen Speicher spart.
+  if (faktor === 1 && blob.size >= datei.size) return datei;
+
+  const basisname = datei.name.replace(/\.[^.]+$/, "");
+  return new File([blob], basisname + ".webp", {
+    type: "image/webp",
+    lastModified: Date.now()
+  });
+}
     document.getElementById("hund-fotos").addEventListener("change", function () {
   const dateien = Array.from(this.files);
 
@@ -3321,8 +3365,11 @@ zeigeFotoVorschau();
   loeschen.style.padding = "12px 20px";
   loeschen.style.margin = "15px 0 0 0";
   loeschen.style.cursor = "pointer";
-    loeschen.onclick = async () => {
-  if (!confirm("Möchtest du " + hund.name + " wirklich löschen?")) return;
+ loeschen.onclick = async () => {
+  if (!confirm(
+    "Möchtest du " + hund.name +
+    " wirklich vollständig löschen? Dabei werden auch Bilder, Standort und Statistik dauerhaft entfernt."
+  )) return;
 
   const { data: { user }, error: authFehler } =
     await supabaseClient.auth.getUser();
@@ -3332,30 +3379,98 @@ zeigeFotoVorschau();
     return;
   }
 
-  const { data: geloescht, error } = await supabaseClient
-    .from("hunde")
-    .delete()
-    .eq("id", hund.id)
-    .select("id");
+  loeschen.disabled = true;
+  loeschen.textContent = "Wird vollständig gelöscht …";
 
-  if (error) {
-    alert("Fehler beim Löschen: " + error.message);
-    return;
+  try {
+    const fotoUrls = Array.isArray(hund.fotos) ? hund.fotos : [];
+    const marker = "/storage/v1/object/public/hundefotos/";
+
+    const fotoPfade = fotoUrls.map(url => {
+      try {
+        const pfad = new URL(url).pathname;
+        const markerIndex = pfad.indexOf(marker);
+        return markerIndex < 0
+          ? null
+          : decodeURIComponent(pfad.slice(markerIndex + marker.length));
+      } catch {
+        return null;
+      }
+    });
+
+    if (fotoPfade.some(pfad => !pfad)) {
+      throw new Error(
+        "Mindestens ein Foto-Pfad konnte nicht erkannt werden. Der Hund wurde nicht gelöscht."
+      );
+    }
+
+    for (const tabelle of ["hunde_interaktionen", "hunde_standorte"]) {
+      const { error: tabellenFehler } = await supabaseClient
+        .from(tabelle)
+        .delete()
+        .eq("hund_id", hund.id);
+
+      if (tabellenFehler) {
+        throw new Error(
+          "Ein verknüpfter Eintrag konnte nicht gelöscht werden (" +
+          tabelle + "): " + tabellenFehler.message
+        );
+      }
+    }
+
+    if (fotoPfade.length) {
+      const { error: fotoFehler } = await supabaseClient.storage
+        .from("hundefotos")
+        .remove(fotoPfade);
+
+      if (fotoFehler) {
+        throw new Error(
+          "Die Fotos konnten nicht aus dem Speicher gelöscht werden: " +
+          fotoFehler.message
+        );
+      }
+    }
+
+    const { data: geloescht, error: hundFehler } = await supabaseClient
+      .from("hunde")
+      .delete()
+      .eq("id", hund.id)
+      .select("id");
+
+    if (hundFehler) {
+      throw new Error(
+        "Fotos wurden gelöscht, aber der Hundedatensatz konnte nicht gelöscht werden: " +
+        hundFehler.message
+      );
+    }
+
+    if (!geloescht || geloescht.length === 0) {
+      throw new Error(
+        "Fotos wurden gelöscht, aber der Hundedatensatz durfte nicht gelöscht werden."
+      );
+    }
+
+    const lokaleFavoriten = holeFavoriten().filter(
+      id => String(id) !== String(hund.id)
+    );
+    speichereFavoriten(lokaleFavoriten);
+
+    details.hidden = true;
+    document.querySelector("main > h2").style.removeProperty("display");
+    document.getElementById("hunde-counter").style.removeProperty("display");
+    document.querySelector('label[for="hundesortierung"]')
+      .style.removeProperty("display");
+    document.getElementById("hundesortierung")
+      .style.removeProperty("display");
+    document.getElementById("hundefilter").style.display = "";
+    document.getElementById("hundeliste").style.display = "";
+
+    await aktualisiereHundekarten();
+  } catch (fehler) {
+    alert("Vollständiges Löschen fehlgeschlagen: " + fehler.message);
+    loeschen.disabled = false;
+    loeschen.textContent = "🗑️ Hund löschen";
   }
-
-  if (!geloescht || geloescht.length === 0) {
-    alert("Löschen nicht erlaubt.");
-    return;
-  }
-
-  details.hidden = true;
-      document.querySelector("main > h2").style.removeProperty("display");
-document.getElementById("hunde-counter").style.removeProperty("display");
-document.querySelector('label[for="hundesortierung"]').style.removeProperty("display");
-document.getElementById("hundesortierung").style.removeProperty("display");
-  document.getElementById("hundefilter").style.display = "";
-  document.getElementById("hundeliste").style.display = "";
- await aktualisiereHundekarten();
 };
 
   details.append(bearbeiten, loeschen);
@@ -3543,8 +3658,22 @@ beschreibung: wert("hund-beschreibung")
   .map(foto => foto.datei);
 const fotoUrls = [];
 
-for (const datei of dateien) {
-  const dateiname = crypto.randomUUID() + "-" + datei.name;
+for (const originalDatei of dateien) {
+  let datei;
+  try {
+    datei = await komprimiereHundfoto(originalDatei);
+  } catch (fehler) {
+    ladeAnzeige.remove();
+    meldung.style.display = "block";
+    meldung.textContent =
+      "Foto konnte nicht verarbeitet werden: " + fehler.message;
+    return;
+  }
+
+  const endung = datei.type === "image/webp"
+    ? "webp"
+    : (datei.name.split(".").pop() || "img");
+  const dateiname = crypto.randomUUID() + "." + endung;
 
   const { error: uploadFehler } = await supabaseClient.storage
     .from("hundefotos")
@@ -3553,12 +3682,12 @@ for (const datei of dateien) {
     });
 
   if (uploadFehler) {
-  ladeAnzeige.remove();
-  meldung.style.display = "block";
-  meldung.textContent =
-    "Foto-Upload fehlgeschlagen: " + uploadFehler.message;
-  return;
-}
+    ladeAnzeige.remove();
+    meldung.style.display = "block";
+    meldung.textContent =
+      "Foto-Upload fehlgeschlagen: " + uploadFehler.message;
+    return;
+  }
 
   const { data } = supabaseClient.storage
     .from("hundefotos")

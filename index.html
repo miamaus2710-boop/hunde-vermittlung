@@ -2219,30 +2219,12 @@ function hundefotoPfadAusUrl(url) {
 
 async function loescheHundefotosAusUrls(urls) {
   const pfade = [...new Set(urls.map(hundefotoPfadAusUrl))];
-  const vorhandenePfade = [];
 
-  // Bereits gelöschte Fotos überspringen, damit ein erneuter Versuch klappt.
-  for (const pfad of pfade) {
-    const letzterSlash = pfad.lastIndexOf("/");
-    const ordner = letzterSlash < 0 ? "" : pfad.slice(0, letzterSlash);
-    const dateiname = letzterSlash < 0 ? pfad : pfad.slice(letzterSlash + 1);
-
-    const { data, error: listenFehler } = await supabaseClient.storage
-      .from("hundefotos")
-      .list(ordner, { search: dateiname, limit: 100 });
-
-    if (listenFehler) throw listenFehler;
-
-    if ((data || []).some(eintrag => eintrag.name === dateiname)) {
-      vorhandenePfade.push(pfad);
-    }
-  }
-
-  if (!vorhandenePfade.length) return;
+  if (!pfade.length) return;
 
   const { error } = await supabaseClient.storage
     .from("hundefotos")
-    .remove(vorhandenePfade);
+    .remove(pfade);
 
   if (error) throw error;
 }

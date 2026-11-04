@@ -2205,7 +2205,48 @@ async function komprimiereHundfoto(datei) {
   zeigeFotoVorschau();
 });
 
-function zeigeFotoVorschau() {
+function hundefotoPfadAusUrl(url) {
+  const marker = "/storage/v1/object/public/hundefotos/";
+  const pfad = new URL(url).pathname;
+  const markerIndex = pfad.indexOf(marker);
+
+  if (markerIndex < 0) {
+    throw new Error("Foto-URL gehört nicht zum Hundefotos-Speicher.");
+  }
+
+  return decodeURIComponent(pfad.slice(markerIndex + marker.length));
+}
+
+async function loescheHundefotosAusUrls(urls) {
+  const pfade = [...new Set(urls.map(hundefotoPfadAusUrl))];
+  const vorhandenePfade = [];
+
+  // Bereits gelöschte Fotos überspringen, damit ein erneuter Versuch klappt.
+  for (const pfad of pfade) {
+    const letzterSlash = pfad.lastIndexOf("/");
+    const ordner = letzterSlash < 0 ? "" : pfad.slice(0, letzterSlash);
+    const dateiname = letzterSlash < 0 ? pfad : pfad.slice(letzterSlash + 1);
+
+    const { data, error: listenFehler } = await supabaseClient.storage
+      .from("hundefotos")
+      .list(ordner, { search: dateiname, limit: 100 });
+
+    if (listenFehler) throw listenFehler;
+
+    if ((data || []).some(eintrag => eintrag.name === dateiname)) {
+      vorhandenePfade.push(pfad);
+    }
+  }
+
+  if (!vorhandenePfade.length) return;
+
+  const { error } = await supabaseClient.storage
+    .from("hundefotos")
+    .remove(vorhandenePfade);
+
+  if (error) throw error;
+}
+    function zeigeFotoVorschau() {
   const bereich = document.getElementById("foto-vorschau");
   bereich.innerHTML = "";
 
@@ -3365,7 +3406,7 @@ zeigeFotoVorschau();
   loeschen.style.padding = "12px 20px";
   loeschen.style.margin = "15px 0 0 0";
   loeschen.style.cursor = "pointer";
- loeschen.onclick = async () => {
+loeschen.onclick = async () => {
   if (!confirm(
     "Möchtest du " + hund.name +
     " wirklich vollständig löschen? Dabei werden auch Bilder, Standort und Statistik dauerhaft entfernt."
@@ -3384,69 +3425,27 @@ zeigeFotoVorschau();
 
   try {
     const fotoUrls = Array.isArray(hund.fotos) ? hund.fotos : [];
-    const marker = "/storage/v1/object/public/hundefotos/";
 
-    const fotoPfade = fotoUrls.map(url => {
-      try {
-        const pfad = new URL(url).pathname;
-        const markerIndex = pfad.indexOf(marker);
-        return markerIndex < 0
-          ? null
-          : decodeURIComponent(pfad.slice(markerIndex + marker.length));
-      } catch {
-        return null;
-      }
-    });
+    // Erst die Fotos löschen. Bei einem Fehler bleiben die Hundedaten erhalten.
+    await loescheHundefotosAusUrls(fotoUrls);
 
-    if (fotoPfade.some(pfad => !pfad)) {
-      throw new Error(
-        "Mindestens ein Foto-Pfad konnte nicht erkannt werden. Der Hund wurde nicht gelöscht."
-      );
-    }
-
-    for (const tabelle of ["hunde_interaktionen", "hunde_standorte"]) {
-      const { error: tabellenFehler } = await supabaseClient
-        .from(tabelle)
-        .delete()
-        .eq("hund_id", hund.id);
-
-      if (tabellenFehler) {
-        throw new Error(
-          "Ein verknüpfter Eintrag konnte nicht gelöscht werden (" +
-          tabelle + "): " + tabellenFehler.message
-        );
-      }
-    }
-
-    if (fotoPfade.length) {
-      const { error: fotoFehler } = await supabaseClient.storage
-        .from("hundefotos")
-        .remove(fotoPfade);
-
-      if (fotoFehler) {
-        throw new Error(
-          "Die Fotos konnten nicht aus dem Speicher gelöscht werden: " +
-          fotoFehler.message
-        );
-      }
-    }
-
-    const { data: geloescht, error: hundFehler } = await supabaseClient
-      .from("hunde")
-      .delete()
-      .eq("id", hund.id)
-      .select("id");
+    // Datenbankeinträge gemeinsam und atomar löschen.
+    const { data: hundGeloescht, error: hundFehler } =
+      await supabaseClient.rpc("delete_hund_complete", {
+        p_hund_id: String(hund.id)
+      });
 
     if (hundFehler) {
       throw new Error(
-        "Fotos wurden gelöscht, aber der Hundedatensatz konnte nicht gelöscht werden: " +
-        hundFehler.message
+        "Die Fotos wurden gelöscht, aber die Hundedaten blieben erhalten: " +
+        hundFehler.message +
+        ". Du kannst den Löschvorgang erneut starten."
       );
     }
 
-    if (!geloescht || geloescht.length === 0) {
+    if (hundGeloescht !== true) {
       throw new Error(
-        "Fotos wurden gelöscht, aber der Hundedatensatz durfte nicht gelöscht werden."
+        "Die Fotos wurden gelöscht, aber der Hundedatensatz wurde nicht bestätigt."
       );
     }
 
@@ -3472,7 +3471,6 @@ zeigeFotoVorschau();
     loeschen.textContent = "🗑️ Hund löschen";
   }
 };
-
   details.append(bearbeiten, loeschen);
 });
 }
@@ -3752,7 +3750,22 @@ if (standortFehler) {
   meldung.textContent = "Standort konnte nicht gespeichert werden: " + standortFehler.message;
   return;
 }
-const restzeit = Math.max(0, 2000 - (Date.now() - ladeStart));
+// Entfernte Fotos erst löschen, nachdem die Hundedaten gespeichert wurden.
+if (entfernteFotos.length) {
+  try {
+    await loescheHundefotosAusUrls(entfernteFotos);
+    entfernteFotos = [];
+  } catch (fotoFehler) {
+    ladeAnzeige.remove();
+    meldung.style.display = "block";
+    meldung.textContent =
+      "Hundedaten sind gespeichert, aber entfernte Fotos liegen noch im Speicher. " +
+      "Klicke erneut auf Speichern, um das Löschen zu wiederholen. " +
+      fotoFehler.message;
+    return;
+  }
+}
+        const restzeit = Math.max(0, 2000 - (Date.now() - ladeStart));
 await new Promise(resolve => setTimeout(resolve, restzeit));
 ladeAnzeige.remove();
 
